@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">Create account</div>
+{% endblock %}
+
+{% block content %}
+<div>
+  <br>
+  <form method="POST">
+    {% csrf_token %}
+
+    {% bootstrap_form form layout='horizontal' %}
+
+    <a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn btn-primary">Create</button>
+  </form>
+</div>
+{% endblock %}

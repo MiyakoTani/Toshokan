@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+{% if user.is_authenticated %}
+{% else %}
+<div class="h1">Login</div>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.is_staff %}
+<nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand">管理者ページ</a>
+        <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse" data-bs-target="#exampleNavbarToggle"
+            aria-controls="exampleNavbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="exampleNavbarToggle">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="#">書籍の返却</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">書籍登録</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">書籍編集</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">書籍削除</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">場所登録</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">場所削除</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}">ログアウト</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:password_change' %}">パスワード変更</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">管理者登録</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">管理者削除</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:change' %}">アカウント編集</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">アカウント削除</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="p" style="margin-top: 70px;">
+    <table class="table">
+        <tr><th><td>ユーザーネーム：</td><td>{{ user.username }}</td></th></tr>
+        <tr><th><td>名前：</td><td>{{ user.first_name }} {{ user.last_name }}</td></th></tr>
+        <tr><th><td>メールアドレス：</td><td>{{ user.email }}</td></th></tr>
+    </table>
+
+</div>
+
+
+{% elif user.is_authenticated and not user.is_staff %}
+
+<nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand">MyPage</a>
+        <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse" data-bs-target="#exampleNavbarToggle"
+            aria-controls="exampleNavbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="exampleNavbarToggle">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="#">本を探す</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">本棚</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">返却</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">貸出履歴</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}">ログアウト</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:password_change' %}">パスワード変更</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:change' %}">アカウント編集</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">アカウント削除</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="p" style="margin-top: 70px;">
+    <table class="table">
+        <tr><th><td>ユーザーネーム：</td><td>{{ user.username }}</td></th></tr>
+        <tr><th><td>名前：</td><td>{{ user.first_name }} {{ user.last_name }}</td></th></tr>
+        <tr><th><td>メールアドレス：</td><td>{{ user.email }}</td></th></tr>
+    </table>
+    <br>
+{% else %}
+<form method="post">
+    <br>
+    {% csrf_token %}
+    {% bootstrap_form form layout='horizontal' %}
+    <div class="mt-4">
+        <a href="{% url 'accounts:signup' %}" class="btn btn-secondary">Create</a>
+        <button type="submit" class="btn btn-primary">Login</button><br>
+        <a href="{% url 'accounts:signup' %}">ユーザーネーム,パスワードがわからない</a>
+    </div>
+</form>
+{% endif %}
+{% endblock %}
