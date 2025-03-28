@@ -48,4 +48,3 @@ class PasswordChange(PasswordChangeView):
 '''パスワード変更完了'''
 class PasswordChangeDone(PasswordChangeDoneView):
     template_name = 'accounts/password_change_done.html'
-
