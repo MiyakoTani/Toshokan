@@ -1,10 +1,12 @@
 from django.contrib.auth import login, authenticate
-from django.shortcuts import render
-from django.views.generic import TemplateView, CreateView, FormView
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.views.generic import TemplateView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as BaseLoginView,  LogoutView as BaseLogoutView, PasswordChangeView, PasswordChangeDoneView
 from django.urls import reverse_lazy
-from .forms import SignUpForm, LoginForm, MyPasswordChangeForm
+from .forms import SignUpForm, LoginForm, MyPasswordChangeForm, UserChangeForm
+
 
 
 class IndexView(BaseLoginView):
@@ -48,3 +50,12 @@ class PasswordChange(PasswordChangeView):
 '''パスワード変更完了'''
 class PasswordChangeDone(PasswordChangeDoneView):
     template_name = 'accounts/password_change_done.html'
+
+'''ユーザー編集機能'''
+class UserChangeView(UpdateView):
+    form_class = UserChangeForm
+    template_name = "accounts/change.html"
+    success_url = reverse_lazy('accounts:index')
+
+    def get_object(self):
+        return self.request.user

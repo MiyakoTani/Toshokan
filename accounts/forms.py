@@ -1,8 +1,9 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from django import forms
 from django.forms import ModelForm
-from .models import User
-
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 
 class SignUpForm(UserCreationForm):
     class Meta:
@@ -26,3 +27,12 @@ class MyPasswordChangeForm(PasswordChangeForm):
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 
+class UserChangeForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+        )
