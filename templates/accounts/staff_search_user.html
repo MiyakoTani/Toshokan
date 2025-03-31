@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">アカウント管理</div>
+{% endblock %}
+
+{% block content %}
+<br>
+<form method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form layout='horizontal' %}
+    <button type="submit" class="btn btn-secondary">Search</button>
+</form>
+<hr>
+<table class="table">
+    <tr>
+        <th>ユーザーネーム</th>
+        <th>姓名</th>
+        <th>メールアドレス</th>
+    </tr>
+    {% for item in data %}
+    <tr>
+        <td>{{item.username}}</td>
+        <td>{{item.last_name}} {{item.first_name}}</td>
+        <td>{{item.email}}</td>
+        <td><a href="{% url 'accounts:staff_accounts_change' item.username %}">Edit</a></td>
+    </tr>
+    {% endfor %}
+</table>
+<a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+{% endblock %}

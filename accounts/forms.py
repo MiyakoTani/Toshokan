@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from django import forms
 from django.forms import ModelForm
-from django.contrib.auth.models import User
+from .models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 
@@ -14,6 +14,12 @@ class SignUpForm(UserCreationForm):
             "first_name",
             "last_name",
         )
+        labels={
+           "username":"ユーザーネーム",
+            "email":"メールアドレス",
+            "first_name":"名",
+            "last_name":"姓",
+           }
 
 # ログインフォーム
 class LoginForm(AuthenticationForm):
@@ -36,3 +42,42 @@ class UserChangeForm(forms.ModelForm):
             "first_name",
             "last_name",
         )
+        labels={
+           "username":"ユーザーネーム",
+            "email":"メールアドレス",
+            "first_name":"名",
+            "last_name":"姓",
+           }
+
+class UserDeleteForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "is_active",
+        )
+        labels={
+           'is_active':'ユーザーを有効化',
+           }
+        
+class StaffCreateForm(forms.Form):
+    username = forms.CharField(label='ユーザーネーム', required=False)
+
+class StaffAccountsChangeForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "is_active",
+            "is_staff",
+        )
+        labels={
+           "username":"ユーザーネーム",
+            "email":"メールアドレス",
+            "first_name":"名",
+            "last_name":"姓",
+            'is_active':'ユーザーを有効化',
+            'is_staff':'管理者権限',
+           }
