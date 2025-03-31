@@ -5,7 +5,7 @@ from django.views.generic import TemplateView, CreateView, FormView, UpdateView,
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView as BaseLoginView,  LogoutView as BaseLogoutView, PasswordChangeView, PasswordChangeDoneView
 from django.urls import reverse_lazy
-from .forms import SignUpForm, LoginForm, MyPasswordChangeForm, UserChangeForm, UserDeleteForm, StaffCreateForm, StaffAccountsChangeForm
+from .forms import SignUpForm, LoginForm, MyPasswordChangeForm, UserChangeForm, UserDeleteForm, StaffAccountsChangeForm
 from .models import User
 
 
@@ -72,7 +72,6 @@ class UserDeleteView(UpdateView):
     
 def staff(request):
     params = {
-        'form':StaffCreateForm(),
         'data':[],
     }
     if (request.method == 'POST'):
@@ -80,7 +79,6 @@ def staff(request):
         try:
             item = User.objects.get(username=num)
             params['data'] = [item]
-            params['form'] = StaffCreateForm(request.POST)
         except:
             params['data'] = User.objects.all()
     else:

@@ -58,9 +58,6 @@ class UserDeleteForm(forms.ModelForm):
         labels={
            'is_active':'ユーザーを有効化',
            }
-        
-class StaffCreateForm(forms.Form):
-    username = forms.CharField(label='ユーザーネーム', required=False)
 
 class StaffAccountsChangeForm(forms.ModelForm):
     class Meta:

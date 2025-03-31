@@ -9,8 +9,15 @@
 <br>
 <form method="POST">
     {% csrf_token %}
-    {% bootstrap_form form layout='horizontal' %}
-    <button type="submit" class="btn btn-secondary">Search</button>
+
+    <label for="exampleDataList" class="form-label">ユーザーネーム</label>
+    <input class="form-control" list="username" name="username">
+    <datalist id="username">
+        {% for item in data %}
+        <option value={{item.username}}>
+        {% endfor %}
+    </datalist>
+    <button type="submit" class="btn btn-secondary mt-2">Search</button>
 </form>
 <hr>
 <table class="table">
