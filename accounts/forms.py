@@ -78,3 +78,14 @@ class StaffAccountsChangeForm(forms.ModelForm):
             'is_active':'ユーザーを有効化',
             'is_staff':'管理者権限',
            }
+        
+class ForgetForm(forms.Form):
+    choice = forms.ChoiceField(
+        label="分からない方を選択してください。",
+        choices=(
+            ('un','ユーザーネーム'),
+            ('pw','パスワード'),
+        ),
+        initial = "un",
+        widget=forms.RadioSelect(),
+    )

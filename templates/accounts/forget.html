@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">Create account</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-2">
+  <br>
+  <a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+  <a href="{% url 'accounts:index' %}"  class="btn btn-secondary">Username</a>
+  <a href="{% url 'accounts:password_reset' %}"  class="btn btn-secondary">Password</a>
+</div>
+{% endblock %}
