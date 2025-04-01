@@ -89,3 +89,17 @@ class ForgetForm(forms.Form):
         initial = "un",
         widget=forms.RadioSelect(),
     )
+
+class UsernameForm(ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "email",
+            "first_name",
+            "last_name",
+        )
+        labels={
+            "email":"メールアドレス",
+            "first_name":"名",
+            "last_name":"姓",
+           }

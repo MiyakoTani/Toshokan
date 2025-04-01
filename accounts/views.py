@@ -5,7 +5,8 @@ from django.views.generic import TemplateView, CreateView, FormView, UpdateView,
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView as BaseLoginView,  LogoutView as BaseLogoutView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.urls import reverse_lazy
-from .forms import SignUpForm, LoginForm, MyPasswordChangeForm, UserChangeForm, UserDeleteForm, StaffAccountsChangeForm, ForgetForm
+from django.core.paginator import Paginator
+from .forms import SignUpForm, LoginForm, MyPasswordChangeForm, UserChangeForm, UserDeleteForm, StaffAccountsChangeForm, ForgetForm, UsernameForm
 from .models import User
 
 
@@ -70,7 +71,7 @@ class UserDeleteView(UpdateView):
     def get_object(self):
         return self.request.user
     
-def staff(request):
+def staff(request, num=1):
     params = {
         'data':[],
     }
@@ -81,6 +82,7 @@ def staff(request):
             params['data'] = [item]
         except:
             params['data'] = User.objects.all()
+
     else:
         params['data'] = User.objects.all()
     return render(request, 'accounts/staff_search_user.html', params)
@@ -134,3 +136,8 @@ class PasswordResetConfirmView(PasswordResetConfirmView):
 class PasswordResetCompleteView(PasswordResetCompleteView):
     """新パスワード設定しましたページ"""
     template_name = 'accounts/password_reset_complete.html'
+
+class UsernameView(TemplateView):
+    """ ホームビュー """
+    form_class = UsernameForm
+    template_name = "index.html"
