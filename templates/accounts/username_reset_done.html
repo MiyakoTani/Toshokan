@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">送信完了</div>
+{% endblock %}
+
+{% block content %}
+<p>ユーザーネームを記載したメールを送信しました。</p>
+<a href="{% url 'accounts:index' %}" class="btn btn-primary">Login</a>
+{% endblock %}

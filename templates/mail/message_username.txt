@@ -1,0 +1,3 @@
+{{ user.lastname }} 様
+
+あなたのユーザーネームは{{ user.username }}です。

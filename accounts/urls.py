@@ -11,12 +11,13 @@ urlpatterns = [
     path('password_change_done/', views.PasswordChangeDone.as_view(), name='password_change_done'), # パスワード変更完了
     path('change/', views.UserChangeView.as_view(), name="change"),# ユーザー編集
     path('accounts_delete/', views.UserDeleteView.as_view(), name='delete'), # ユーザー削除
-    path('staff_search_user', views.staff, name='staff'), 
+    path('staff_search_user/<int:page>', views.staff, name='staff'), 
     path('staff_accounts_change/<str:num>', views.StaffAccountsChange, name='staff_accounts_change'), 
     path('forget', views.ForgetView.as_view(), name='forget'), 
     path('password_reset/', views.PasswordResetView.as_view(), name='password_reset'), #追加
     path('password_reset_done/', views.PasswordResetDoneView.as_view(), name='password_reset_done'), #追加
     path('password_reset_confirm/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'), #追加
     path('password_reset_complete/', views.PasswordResetCompleteView.as_view(), name='password_reset_complete'), #追加
-    path('forget_username', views.UsernameView.as_view(), name='forget_username'), 
+    path('username_reset/', views.UsernameResetView.as_view(), name='username_reset'), #追加
+    path('username_reset_done/', views.UsernameResetDoneView.as_view(), name='username_reset_done'),
 ]

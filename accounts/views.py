@@ -71,28 +71,51 @@ class UserDeleteView(UpdateView):
     def get_object(self):
         return self.request.user
     
-def staff(request, num=1):
+def staff(request, page=1):
     params = {
         'data':[],
+        'data_p':[],
+        'data_list':[],
     }
+
+    page_cnt = 5 #一画面あたり10コ表示する
+    onEachSide = 3 #選択ページの両側には3コ表示する
+    onEnds = 2 #左右両端には2コ表示する
     if (request.method == 'POST'):
         num = request.POST['username']
         try:
             item = User.objects.get(username=num)
-            params['data'] = [item]
+            params['data_p'] = [item]
         except:
-            params['data'] = User.objects.all()
+            params['data'] = User.objects.order_by('username').all()
+            # paginatorのオブジェクトをつくってる
+            data_page = Paginator(params['data'], page_cnt)
+            
+            # paginatorのオブジェクトからページを指定した状態のオブジェクトつくってる
+            params['data_p'] = data_page.get_page(page)
 
+            # 指定したページのオブジェクトからページリンク先のリストを作っている
+            params['data_list'] = params['data_p'].paginator.get_elided_page_range(page, on_each_side=onEachSide, on_ends=onEnds) 
     else:
-        params['data'] = User.objects.all()
-    return render(request, 'accounts/staff_search_user.html', params)
+        params['data'] = User.objects.order_by('username').all()
+        # paginatorのオブジェクトをつくってる
+        data_page = Paginator(params['data'], page_cnt)
+        
+        # paginatorのオブジェクトからページを指定した状態のオブジェクトつくってる
+        params['data_p'] = data_page.get_page(page)
+
+        # 指定したページのオブジェクトからページリンク先のリストを作っている
+        params['data_list'] = params['data_p'].paginator.get_elided_page_range(page, on_each_side=onEachSide, on_ends=onEnds) 
+    
+            
+    return render(request,'accounts/staff_search_user.html', params)
 
 def StaffAccountsChange(request, num):
     obj = User.objects.get(username=num)
     if (request.method == 'POST'):
         user = StaffAccountsChangeForm(request.POST, instance=obj)
         user.save()
-        return redirect(to='/accounts/staff_search_user')
+        return redirect(to='/staff_search_user/1')
     params = {
         'username':num,
         'form': StaffAccountsChangeForm(instance=obj),
@@ -137,7 +160,15 @@ class PasswordResetCompleteView(PasswordResetCompleteView):
     """新パスワード設定しましたページ"""
     template_name = 'accounts/password_reset_complete.html'
 
-class UsernameView(TemplateView):
-    """ ホームビュー """
-    form_class = UsernameForm
-    template_name = "index.html"
+class UsernameResetView(PasswordResetView):
+    """ユーザーネーム変更用URLの送付ページ"""
+    # 送信元のGmailアカウント情報
+    subject_template_name = 'mail/subject_username.txt'
+    email_template_name = 'mail/message_username.txt'
+    template_name = 'accounts/username_reset.html'
+    success_url = reverse_lazy('accounts:username_reset_done')
+
+class UsernameResetDoneView(TemplateView):
+    """ユーザーネーム変更用URLを送りましたページ"""
+    template_name = 'accounts/username_reset_done.html'
+

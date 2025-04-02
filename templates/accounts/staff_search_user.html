@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
 
+
 {% block title %}
 <div class="h1">アカウント管理</div>
 {% endblock %}
@@ -26,7 +27,7 @@
         <th>姓名</th>
         <th>メールアドレス</th>
     </tr>
-    {% for item in data %}
+    {% for item in data_p %}
     <tr>
         <td>{{item.username}}</td>
         <td>{{item.last_name}} {{item.first_name}}</td>
@@ -35,6 +36,6 @@
     </tr>
     {% endfor %}
 </table>
-
+{% include 'accounts/page.html' %}
 <a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
 {% endblock %}
