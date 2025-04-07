@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    <div class="h1">{{ book.title }}</div>
+{% endblock %}
+
+{% block content %}
+<br>
+<div class="container-fluid">
+    <div class="row row-cols-auto">
+      <div class="col-auto my-box">
+        <img src="{{book.cover}}" alt="カバー画像" style="float: left;" /><br>
+        <p><strong>現在の状態:</strong>
+            {% if book.is_borrowed %} <span class="bg-danger p-1 text-dark" style="--bs-bg-opacity: 8%"> 貸出中 
+            {% else %} <span class="bg-success p-1 text-dark" style="--bs-bg-opacity: 8%"> 貸出可 
+            {% endif %}</p>
+        <a href="{% url 'books:book_crate' %}" class="btn btn-secondary">Back</a>
+      </div>
+      <div class="col-auto my-box">
+        <table class="table" style="float: left;" >
+            <tr><th><td><strong>ISBN：</strong></td><td>{{ book.isbn }}</td></th></tr>
+            <tr><th><td><strong>タイトル：</strong></td><td>{{ book.title }}</td></th></tr>
+            <tr><th><td><strong>著者：</strong></td><td>{{ book.author }}</td></th></tr>
+            <tr><th><td><strong>ページ数：</strong></td><td>{{ book.volume }}</td></th></tr>
+            <tr><th><td><strong>シリーズ：</strong></td><td>{{ book.series }}</td></th></tr>
+            <tr><th><td><strong>出版社：</strong></td><td>{{ book.publisher }}</td></th></tr>
+            <tr><th><td><strong>出版日：</strong></td><td>{{ book.pubdate }}</td></th></tr>
+        </table>
+    </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

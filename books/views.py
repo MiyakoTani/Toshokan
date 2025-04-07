@@ -57,6 +57,14 @@ class PlaceDeleteView(DeleteView):
     model = Place
     success_url = reverse_lazy('books:place_delete', args=[1])
 
+    def post(self, request, *args, **kwargs):
+        try:
+            obj = self.get_object()
+            obj.delete()
+            return HttpResponseRedirect(self.success_url)
+        except models.ProtectedError as e:
+            messages.error(request, f'「{obj}」の本棚にはまだ本があります。')
+
 import requests
 import json
     
@@ -138,17 +146,13 @@ def ISBNAPIGet(request):
         data['cover']=(res[0]["summary"]["cover"])
     return render(request, 'books/bookdata.html', data)
 
-class BookCreateView(CreateView):
-    form_class = BookForm
-    template_name = "books/book_create.html"
-    success_url = reverse_lazy("books:book_create")
-
 import requests
 
 def get_book_data(isbn):
     url = "https://api.openbd.jp/v1/get"
     params = {"isbn": isbn}
     response = requests.get(url, params=params)
+
     
     if response.status_code == 200:
         data = response.json()
@@ -162,38 +166,56 @@ def get_book_data(isbn):
                 "pubdate": summary.get("pubdate", ""),
                 "cover": summary.get("cover", "")
             }
+
     return None
+
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 class BookCreateView1(CreateView):
     model = Book
     form_class = BookForm
     template_name = 'books/ISBN_search.html'
 
-    def get_initial(self):
-        initial = super().get_initial()
-        
-        # URLのGETパラメータからISBNを取得
-        isbn = self.request.GET.get('isbn')
-        if isbn:
-            # ISBNがある場合、APIからデータを取得して初期値として設定
-            book_data = get_book_data(isbn)
-            if book_data:
-                initial.update(book_data)
-        
-        return initial
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        isbn = request.GET.get('isbn')  # ISBNがGETリクエストに含まれている場合
 
-    def form_valid(self, form):
+        if isbn:
+            # ISBNが指定されている場合、APIからデータを取得してフォームにセット
+            try:
+                book_data = get_book_data(isbn)
+            except:
+                # リクエストエラーが発生した場合、ログに記録してNoneを返す
+                messages.error(request, '書籍が見つかりませんでした。手動でデータを入力してください。')
+            # APIから取得したデータをフォームに反映
+            form = self.form_class(initial=book_data)
+
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+
         # フォームが有効な場合、データを保存
-        
-        cleaned_data = form.cleaned_data
-        book = Book.objects.create(
-            isbn=cleaned_data['isbn'],
-            title=cleaned_data['title'],
-            author=cleaned_data['author'],
-            publisher=cleaned_data.get('publisher', ''),
-            pubdate=cleaned_data.get('pubdate', None),
-            cover=cleaned_data.get('cover', ''),
-            place=cleaned_data.get('place', '')  # 場所情報も保存
-        )
-        
-        return reverse("accounts:index")  # 保存後、詳細ページへリダイレクト
+        if form.is_valid():
+            form.save()  # Bookオブジェクトを保存
+            return HttpResponseRedirect(reverse('books:book_detail', kwargs={'pk': form.instance.pk}))  # 保存後に詳細ページにリダイレクト
+
+        # フォームが無効な場合は再度表示
+        return render(request, self.template_name, {'form': form})
+    
+from django.http import Http404
+from django.views.generic import DetailView
+
+class BookDetailView(DetailView):
+    model = Book
+    template_name = 'books/book_detail.html'
+    context_object_name = 'book'
+
+    def get_object(self):
+        # URLから取得するPKで書籍を取得
+        pk = self.kwargs.get('pk')
+        try:
+            return Book.objects.get(pk=pk)
+        except Book.DoesNotExist:
+            raise Http404

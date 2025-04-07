@@ -13,7 +13,7 @@ class Book(models.Model):
     volume= models.CharField(max_length=100, blank=True, null=True)
     series= models.CharField(max_length=100, blank=True, null=True)
     publisher= models.CharField(max_length=100, blank=True, null=True)
-    pubdate= models.IntegerField(max_length=10, blank=True, null=True)
+    pubdate= models.IntegerField(blank=True, null=True)
     cover= models.CharField(max_length=100, blank=True, null=True)
     place=models.ForeignKey(Place, on_delete=models.PROTECT)
     is_borrowed = models.BooleanField(
