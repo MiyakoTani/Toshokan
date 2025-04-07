@@ -123,21 +123,7 @@ def StaffAccountsChange(request, num):
     return render(request, 'accounts/staff_accounts_change.html', params)
 
 class ForgetView(TemplateView):
-    """ ユーザー登録用ビュー """
-    def __init__(self):
-        self.params = {
-            'form': ForgetForm(),
-            'result':None
-        }
-  
-    def get(self, request):
-        return render(request, "accounts/forget.html" , self.params)
-
-    def post(self, request):
-        ch = request.POST['choice']
-        self.params['result'] = ch
-        self.params['form'] = ForgetForm(request.POST)
-        return render(request, "accounts/forget.html", self.params)
+    template_name = 'accounts/forget.html'
 
 class PasswordResetView(PasswordResetView):
     """パスワード変更用URLの送付ページ"""

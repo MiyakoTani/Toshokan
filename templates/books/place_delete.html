@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+
+{% block title %}
+<div class="h1">本棚管理</div>
+{% endblock %}
+
+{% block content %}
+{{p}}
+<br>
+<form method="POST">
+    {% csrf_token %}
+
+    <label for="exampleDataList" class="form-label">本棚の場所</label>
+    <input class="form-control" list="place" name="place">
+    <datalist id="place">
+        {% for item in data %}
+        <option value={{item.place}}>
+        {% endfor %}
+    </datalist>
+    <button type="submit" class="btn btn-secondary mt-2">Search</button>
+</form>
+<hr>
+<table class="table">
+    <tr>
+        <th>本棚の場所</th>
+    </tr>
+    {% for item in data_p %}
+    <tr>
+        <td>{{item.place}}</td>
+        <td><a href="{% url 'books:place_change' item.pk %}">Delete</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% include 'accounts/page.html' %}
+<a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+{% endblock %}

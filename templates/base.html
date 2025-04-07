@@ -6,9 +6,14 @@
     <div class="container">
         <h1>{% block title %}(no title){% endblock %}</h1>
 
-        {% autoescape off %}{% bootstrap_messages %}{% endautoescape %}
+        {% autoescape off %}{% if messages %}
+        <div class="position-absolute bottom-0 start-50 translate-middle-x">
+            {% bootstrap_messages %}
+        </div>
+    {% endif %}
+    {% endautoescape %}
 
         {% block content %}(no content){% endblock %}
     </div>
-
+    
 {% endblock %}

@@ -21,11 +21,11 @@
         <div class="collapse navbar-collapse" id="exampleNavbarToggle">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="#">書籍の返却</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">書籍登録</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'books:book_create' %}">書籍登録</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">書籍編集</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">書籍削除</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">場所登録</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">場所削除</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'books:place_make' %}">場所登録</a></li>
+                <li class="nav-item"><a class="nav-link" href="/place_delete/1">場所削除</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}">ログアウト</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'accounts:password_change' %}">パスワード変更</a></li>
                 <li class="nav-item"><a class="nav-link" href="/staff_search_user/1">ユーザー管理</a></li>

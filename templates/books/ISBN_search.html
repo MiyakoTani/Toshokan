@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">Add Book</div>
+{% endblock %}
+
+{% block content %}
+<form method="GET">
+    <label for="isbn">ISBNを入力してください：</label>
+    <input type="text" id="isbn" name="isbn" class="form-control" required>
+    <button type="submit" class="btn btn-secondary mt-2">検索</button>
+</form>
+<form method="POST">
+{% csrf_token %}
+{% if form %}
+{% bootstrap_form form layout='horizontal' %}
+    <button type="submit"class="btn btn-primary mt-2">保存</button>
+{% endif %}
+</form>
+{% endblock %}

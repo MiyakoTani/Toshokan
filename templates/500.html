@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+    500:
+    <h3>Server Error</h3>
+{% endblock %}
+
+{% block content %}
+<br>
+<a href="{% url 'accounts:index' %}" class="btn btn-secondary">ホームに戻る</a>
+{% endblock %}

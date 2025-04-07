@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">{{title}}</div>
+{% endblock %}
+
+{% block content %}
+<form action="{% url 'books:bookdata' %}" method="post">
+{% csrf_token %}
+  <label class="form-label" for="isbn">ISBN</label>
+  <input class="form-control" type="text" name="isbn" id="isbn">
+  <button type="submit" class="btn btn-secondary mt-2">Search</button>
+</form>
+<br>
+<div class="container-fluid">
+    <div class="row row-cols-auto">
+      <div class="col-auto my-box"><img src="{{cover}}" alt="cover" style="float: left;" /></div>
+      <div class="col-auto my-box">
+        <table class="table" style="float: left;" >
+            <tr><th><td>ISBN：</td><td>{{ isbn }}</td></th></tr>
+            <tr><th><td>タイトル：</td><td>{{ title }}</td></th></tr>
+            <tr><th><td>著者：</td><td>{{ author }}</td></th></tr>
+            <tr><th><td>ページ数：</td><td>{{ volume }}</td></th></tr>
+            <tr><th><td>シリーズ：</td><td>{{ series }}</td></th></tr>
+            <tr><th><td>出版社：</td><td>{{ publisher }}</td></th></tr>
+            <tr><th><td>出版日：</td><td>{{ pubdate }}</td></th></tr>
+        </table>
+    </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

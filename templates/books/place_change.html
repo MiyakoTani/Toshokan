@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">本棚管理</div>
+{% endblock %}
+
+{% block content %}
+  <br>
+  <form method="POST">
+    {% csrf_token %}
+    <p>本棚 "{{ object }}" を本当に削除しますか?</p>
+    {% bootstrap_form form layout='horizontal' %}
+
+    <a href="/place_delete/1" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn btn-primary">Delete</button>
+  </form>
+{% endblock %}
