@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-{{p}}
+{% if user.is_authenticated and user.is_staff %}
 <br>
 <form method="POST">
     {% csrf_token %}
@@ -35,4 +35,8 @@
 </table>
 {% include 'accounts/page.html' %}
 <a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+{% else %}
+<p>権限がありません。</p>
+<a href="{% url 'accounts:index' %}" class="btn btn-secondary">ホームに戻る</a>
+{% endif %}
 {% endblock %}

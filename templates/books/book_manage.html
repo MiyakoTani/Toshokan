@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+
+{% block title %}
+<div class="h1">書籍管理</div>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.is_staff %}
+<br>
+<div class="container-fluid">
+    <div class="row row-cols-auto">
+      <div class="col-auto my-box">
+<form method="POST">
+    {% csrf_token %}
+
+    <label for="exampleDataList" class="form-label">ID</label>
+    <input class="form-control" list="id" name="id">
+    <datalist id="id">
+        {% for item in data %}
+        <option value="{{item.id}}">
+        {% endfor %}
+    </datalist></div>
+
+    <div class="col-auto my-box">
+    <label for="title" class="form-label">タイトル</label>
+    <input type="text" class="form-control" name="title" value="{{ request.POST.title }}"></div>
+
+    <div class="col-auto my-box">
+    <label for="place" class="form-label">場所</label>
+    <input type="text" class="form-control" name="place" value="{{ request.POST.place }}"></div>
+</div>
+
+    <button type="submit" class="btn btn-secondary mt-2">Search</button>
+</form>
+
+<hr>
+<table class="table">
+    <tr>
+        <th>ID</th>
+        <th>状態</th>
+        <th>タイトル</th>
+        <th>場所</th>
+    </tr>
+    {% for item in data_p %}
+    <tr>
+        <td>{{item.id}}</td>
+        <td>
+            {% if item.is_borrowed %}
+            <span class="bg-danger p-1 text-dark" style="--bs-bg-opacity: 8%"> 貸出中 </span>
+            {% else %} 
+            <span class="bg-success p-1 text-dark" style="--bs-bg-opacity: 8%"> 貸出可 </span>
+            {% endif %}
+        </td>
+        <td>{{item.title}}</td>
+        <td>{{item.place}}</td>
+        <td><a href="{% url 'books:book_detail' item.pk %}">Detail</a></td>
+        <td><a href="{% url 'books:book_update' item.pk %}">Edit</a></td>
+        <td><a href="{% url 'books:book_delete' item.pk %}">Delete</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% include 'accounts/page.html' %}
+<a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+{% else %}
+<p>権限がありません。</p>
+<a href="{% url 'accounts:index' %}" class="btn btn-secondary">ホームに戻る</a>
+{% endif %}
+{% endblock %}

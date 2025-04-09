@@ -28,3 +28,31 @@ class BookForm(forms.ModelForm):
             "cover",
             "place",
         )
+
+class BookUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = (
+            "isbn",
+            "title",
+            "author",
+            "volume",
+            "series",
+            "publisher",
+            "pubdate",
+            "cover",
+            "place",
+            "is_borrowed"
+        )
+        labels={
+           "isbn":"ISBN",
+            "title":"タイトル",
+            "author":"著者",
+            "volume":"ページ数",
+            "series":"シリーズ",
+            "publisher":"出版社",
+            "pubdate":"出版日",
+            "cover":"書影",
+            "place":"本棚の場所",
+            "is_borrowed":"チェックが入っていたら貸出中",
+           }

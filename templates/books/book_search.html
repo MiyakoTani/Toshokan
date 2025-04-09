@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+
+{% block title %}
+<div class="h1">検索</div>
+{% endblock %}
+
+{% block content %}
+<br>
+<form method="POST">
+    {% csrf_token %}
+    <div class="container-fluid">
+    <div class="row row-cols-auto">
+    <div class="col-auto my-box">
+    <label for="title" class="form-label">タイトル</label>
+    <input type="text" class="form-control" name="title" value="{{ request.POST.title }}"></div>
+    <div class="col-auto my-box">
+    <label for="author" class="form-label">著者</label>
+    <input type="text" class="form-control" name="author" value="{{ request.POST.author }}"></div>
+    <div class="col-auto my-box">
+    <label for="publisher" class="form-label">出版社</label>
+    <input type="text" class="form-control" name="publisher" value="{{ request.POST.publisher }}"></div>
+    <div class="col-auto my-box">
+    <label for="pubdate" class="form-label">出版日</label>
+    <input type="text" class="form-control" name="pubdate" value="{{ request.POST.pubdate }}"></div>
+    <div class="col-auto my-box">
+    <label for="place" class="form-label">場所</label>
+    <select class="form-select" name="place" value="{{ request.POST.place }}">
+    <option value=""></option>
+    {% for item in place %}
+    <option value="{{ item.place }}">{{ item.place }}</option>
+    {% endfor %}
+    </select>
+    </div>
+    </div>
+    <button type="submit" class="btn btn-secondary mt-2">Search</button>
+    </div>
+</form>
+
+<hr>
+<table class="table">
+    <tr>
+        <th>書影</th>
+        <th>タイトル</th>
+        <th>著者</th>
+    </tr>
+    {% for item in data_p %}
+    <tr style="height: 120px;">
+        <td><img src="{{item.cover}}" alt="カバー画像" height="100px" />
+            <p>
+            {% if item.is_borrowed %} <span class="bg-danger p-1 text-dark" style="--bs-bg-opacity: 8%"> 貸出中 
+            {% else %} <span class="bg-success p-1 text-dark" style="--bs-bg-opacity: 8%"> 貸出可 
+            {% endif %}
+        </p>
+        </td>
+        <td>{{item.title}}</td>
+        <td>{{item.author}}</td>
+        <td><a href="{% url 'books:book_detail' item.pk %}" class="btn btn-primary">借りる</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% include 'accounts/page.html' %}
+<a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+{% endblock %}

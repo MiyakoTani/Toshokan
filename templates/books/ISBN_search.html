@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block content %}
+{% if user.is_authenticated and user.is_staff %}
     <!-- ISBN検索フォーム -->
     <form method="GET">
         {% csrf_token %}
@@ -20,7 +21,13 @@
         <form method="POST">
             {% csrf_token %}
             {% bootstrap_form form layout='horizontal' %}
+            <a href="{% url 'accounts:index' %}" class="btn btn-secondary mt-2">Back</a>
             <button type="submit" class="btn btn-primary mt-2">保存</button>
+            
         </form>
     {% endif %}
+{% else %}
+<p>権限がありません。</p>
+<a href="{% url 'accounts:index' %}" class="btn btn-secondary">ホームに戻る</a>
+{% endif %}
 {% endblock %}

@@ -3,20 +3,22 @@
 {% load django_bootstrap5 %}
 
 {% block title %}
-<div class="h1">本棚管理</div>
+<div class="h1">Update book</div>
 {% endblock %}
 
 {% block content %}
 {% if user.is_authenticated and user.is_staff %}
+<div>
   <br>
   <form method="POST">
     {% csrf_token %}
-    <p>本棚 "{{ object }}" を本当に削除しますか?</p>
+
     {% bootstrap_form form layout='horizontal' %}
 
-    <a href="/place_delete/1" class="btn btn-secondary">Back</a>
-    <button type="submit" class="btn btn-primary">Delete</button>
+    <a href="/book_manage/1" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn btn-primary">Update</button>
   </form>
+</div>
 {% else %}
 <p>権限がありません。</p>
 <a href="{% url 'accounts:index' %}" class="btn btn-secondary">ホームに戻る</a>
