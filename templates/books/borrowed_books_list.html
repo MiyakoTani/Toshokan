@@ -71,12 +71,12 @@
                 </td>
                 <td>
                     {% if lending.date > today %}
-                    <form method="post" action="{% url 'books:cancel_reservation' lending.id %}" style="display:inline;" onsubmit="return confirm('{{ lending.book.title }}の予約をキャンセルしますか？');">
+                    <form method="post" action="{% url 'books:cancel_reservations' lending.id %}" style="display:inline;" onsubmit="return confirm('{{ lending.book.title }}の予約をキャンセルしますか？');">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger btn-sm">キャンセル</button>
                     </form>
                     {% else %}
-                    <form method="post" action="{% url 'books:return_book' lending.id %}" style="display:inline;" onsubmit="return confirm('{{ lending.book.title }}を返却しますか？');">
+                    <form method="post" action="{% url 'books:return_books' lending.id %}" style="display:inline;" onsubmit="return confirm('{{ lending.book.title }}を返却しますか？');">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-primary btn-sm">返　却　</button>
                     </form>

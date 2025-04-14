@@ -1,4 +1,6 @@
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
@@ -13,7 +15,22 @@ from books.models import Review,Book
 from books.models import Lending
 import datetime
 
+class NotStaffView(TemplateView):
+    """ ホームビュー """
+    template_name = "accounts/not_staff_page.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            today = datetime.date.today()
+            # 貸出または予約中の本一覧（未来 or 今日以降）
+            lendings = Lending.objects.filter(
+                username=self.request.user,
+                is_returned=False,
+            ).order_by('date')
+            context['lendings'] = lendings
+            context['today'] = today
+        return context
 
 class IndexView(BaseLoginView):
     """ ホームビュー """
@@ -33,10 +50,9 @@ class IndexView(BaseLoginView):
             context['today'] = today
         return context
     
-def borrowing_history(request):
+def borrowing_history(request, page=1):
     # 現在ログインしているユーザーを取得
     user = request.user
-    
     # ユーザーの貸出履歴を取得
     lendings = Lending.objects.filter(username=user,is_returned=True).order_by('-date')
     lending_info = []
@@ -49,8 +65,29 @@ def borrowing_history(request):
             'review': review,  # Noneなら未レビュー、存在すればレビュー済み
             'reviews': reviews,
         })
+    
+    params = {
+        'lendings':[],
+        'data_p':[],
+        'data_list':[],
+        'user':user,
+    }
 
-    return render(request, 'accounts/borrowing_history.html', {'user': request.user,'lending_info': lending_info})
+    page_cnt = 10 #一画面あたり10コ表示する
+    onEachSide = 3 #選択ページの両側には3コ表示する
+    onEnds = 2 #左右両端には2コ表示する
+    params['lending_info'] = lending_info
+        # paginatorのオブジェクトをつくってる
+    data_page = Paginator(params['lending_info'], page_cnt)
+        
+        # paginatorのオブジェクトからページを指定した状態のオブジェクトつくってる
+    params['data_p'] = data_page.get_page(page)
+
+        # 指定したページのオブジェクトからページリンク先のリストを作っている
+    params['data_list'] = params['data_p'].paginator.get_elided_page_range(page, on_each_side=onEachSide, on_ends=onEnds) 
+    
+            
+    return render(request,'accounts/borrowing_history.html', params)
 
 def my_review_detail(request, pk):
     book = get_object_or_404(Book, pk=pk)
@@ -107,13 +144,21 @@ class UserChangeView(UpdateView):
         return self.request.user
     
 '''ユーザー削除機能'''
-class UserDeleteView(UpdateView):
-    form_class = UserDeleteForm
-    template_name = "accounts/accounts_delete.html"
-    success_url = reverse_lazy('accounts:index')
+@require_POST
+@login_required
+def DeactivateUser(request):
+    # ログインしているユーザーを取得
+    user = request.user
 
-    def get_object(self):
-        return self.request.user
+    # is_active を False に設定
+    user.is_active = False
+    user.save()
+
+    # ログアウト処理もしておくと親切かも（任意）
+    logout(request)
+
+    # 完了後、トップページなどにリダイレクト
+    return redirect('accounts:index')
     
 def staff(request, page=1):
     params = {

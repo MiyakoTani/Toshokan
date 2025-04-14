@@ -10,6 +10,7 @@ from django.conf import settings
 
 def send_reminder_emails():
     tomorrow = now().date() + timedelta(days=1)
+    tomorrow_str = f"{tomorrow.month}月{tomorrow.day}日"
 
     lendingslend = Lending.objects.filter(
         Q(date=tomorrow)
@@ -24,7 +25,7 @@ def send_reminder_emails():
         user = lending.username
         subject = "【図書館からの通知】貸出予定のお知らせ"
         message = f"{user.username}様\n\n" \
-                  f"明日 {tomorrow} に、貸出の予定があります。\n\n" \
+                  f"明日 {tomorrow_str} に、貸出の予定があります。\n\n" \
                   f"書籍: {lending.book.title}\n" \
                   f"場所: {lending.book.place}\n\n" \
                   f"どうぞよろしくお願いいたします。"
@@ -41,7 +42,7 @@ def send_reminder_emails():
         user = lending.username
         subject = "【図書館からの通知】返却予定のお知らせ"
         message = f"{user.username}様\n\n" \
-                  f"明日 {tomorrow} に、返却の予定があります。\n\n" \
+                  f"明日 {tomorrow_str} に、返却の予定があります。\n\n" \
                   f"書籍: {lending.book.title}\n" \
                   f"場所: {lending.book.place}\n\n" \
                   f"どうぞよろしくお願いいたします。"
@@ -56,15 +57,15 @@ def send_reminder_emails():
 
 # 毎日０時に貸出日になった本を貸出中にする
 def my_job():
-    data = Lending.objects.order_by('-date').all()
-    for item in data:
-        if item.date == datetime.date.today():
-            item.book.is_borrowed = True
-            item.book.save()
-            item.is_returned = False
-            item.is_returned.save()
-            if item.date < datetime.date.today():
-                break
+    today = datetime.date.today()
+    lendings_today = Lending.objects.filter(date=today)
+
+    for item in lendings_today:
+        item.book.is_borrowed = True
+        item.book.save()
+
+        item.is_returned = False
+        item.save()
 
 def start():
     scheduler = BackgroundScheduler()

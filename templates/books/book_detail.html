@@ -23,16 +23,46 @@
         
       </div>
       <div class="col-auto my-box">
+        <p><strong>本の情報</strong></p>
         <table class="table" style="float: left;" >
-            <tr><th><td><strong>ISBN：</strong></td><td>{{ book.isbn }}</td></th></tr>
-            <tr><th><td><strong>タイトル：</strong></td><td>{{ book.title }}</td></th></tr>
-            <tr><th><td><strong>著者：</strong></td><td>{{ book.author }}</td></th></tr>
-            <tr><th><td><strong>ページ数：</strong></td><td>{{ book.volume }}</td></th></tr>
-            <tr><th><td><strong>シリーズ：</strong></td><td>{{ book.series }}</td></th></tr>
-            <tr><th><td><strong>出版社：</strong></td><td>{{ book.publisher }}</td></th></tr>
-            <tr><th><td><strong>出版日：</strong></td><td>{{ book.pubdate }}</td></th></tr>
+            <tr><th>ISBN：<td>{{ book.isbn }}</td></th></tr>
+            <tr><th>タイトル：<td>{{ book.title }}</td></th></tr>
+            <tr><th>著者：<td>{{ book.author }}</td></th></tr>
+            <tr><th>ページ数：<td>{{ book.volume }}</td></th></tr>
+            <tr><th>シリーズ：<td>{{ book.series }}</td></th></tr>
+            <tr><th>出版社：<td>{{ book.publisher }}</td></th></tr>
+            <tr><th>出版日：<td>{{ book.pubdate }}</td></th></tr>
         </table>
     </div>
+    <div class="col-auto my-box">
+        <p><strong>貸出・予約予定</strong></p>
+        {% if reserves %}
+        <table class="table">
+        <tr>
+            <th>貸出日</th>
+            <th>返却予定日</th>
+            <th>状態</th>
+        </tr>
+        {% for reserve in reserves %}
+        <tr>
+            <td>{{ reserve.date|date:"n月j日" }}</td>
+            <td>{{ reserve.returndate|date:"n月j日" }}</td>
+            <td>    
+                {% if reserve.returndate < today %}
+                    <span style="color: red;">期限切れ</span>
+                {% elif reserve.date > today %}
+                    予約中
+                {% else %}
+                    貸出中
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </table>
+        {% else %}
+        <p>貸出・予約はありません。</p>
+        {% endif %}
+    </div>   
   </div>
   
   <br>

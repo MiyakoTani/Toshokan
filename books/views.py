@@ -145,18 +145,41 @@ def get_book_data(isbn):
     params = {"isbn": isbn}
     response = requests.get(url, params=params)
 
-    
     if response.status_code == 200:
         data = response.json()
-        if data and "summary" in data[0]:
-            summary = data[0]["summary"]
+        if data and data[0] and "summary" in data[0]:
+            onix = data[0].get("onix", {})
+            hanmoto = data[0].get("hanmoto", {})
+            summary = data[0].get("summary", {})
+
+            # タイトルの読み仮名
+            titlekana = onix.get("DescriptiveDetail", {}) \
+                .get("TitleDetail", {}) \
+                .get("TitleElement", {}) \
+                .get("TitleText", {}) \
+                .get("collationkey", "")
+
+            # 著者の読み仮名（複数ある場合は連結）
+            contributors = onix.get("DescriptiveDetail", {}).get("Contributor", [])
+            authorkanalist = [
+                contributor.get("PersonName", {}).get("collationkey", "")
+                for contributor in contributors
+            ]
+            authorkana = "/".join(authorkanalist)
+
+            # 出版社の読み仮名
+            pubkana = hanmoto.get("hanmotoinfo", {}).get("yomi", "")
+
             return {
-                "isbn": summary.get("isbn", ""),
                 "title": summary.get("title", ""),
+                "titlekana": titlekana,
                 "author": summary.get("author", ""),
+                "authorkana": authorkana,
                 "publisher": summary.get("publisher", ""),
+                "pubkana": pubkana,
                 "pubdate": summary.get("pubdate", ""),
-                "cover": summary.get("cover", "")
+                "cover": summary.get("cover", ""),
+                "isbn": summary.get("isbn", "")
             }
 
     return None
@@ -202,8 +225,11 @@ class BookDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         book = self.get_object()
+        reserves = Lending.objects.order_by('returndate').filter(book=book,is_returned=False)
         reviews = Review.objects.filter(book=book).order_by('-created_at')
         context['reviews'] = reviews
+        context['reserves'] = reserves
+        context['today'] = datetime.date.today()
         return context
         
 def book_manage(request, page=1):
@@ -228,7 +254,7 @@ def book_manage(request, page=1):
     if id_filter:
         query_filter = query_filter.filter(id=id_filter)
     if title_filter:
-        query_filter = query_filter.filter(title__icontains=title_filter)  # 部分一致
+        query_filter = query_filter.filter(Q(title__icontains=title_filter) | Q(titlekana__icontains=title_filter))  # 部分一致
     if place_filter:
         query_filter = query_filter.filter(place__place__icontains=place_filter)  # 部分一致
 
@@ -283,16 +309,25 @@ def book_search(request, page=1):
     query_filter = Book.objects.all()
 
     if title_filter:
-        query_filter = query_filter.filter(title__icontains=title_filter)  # 部分一致
-    if author_filter:
-        query_filter = query_filter.filter(author__icontains=author_filter)  # 部分一致
-    if publisher_filter:
-        query_filter = query_filter.filter(publisher__icontains=publisher_filter)  # 部分一致
-    if pubdate_filter:
-        query_filter = query_filter.filter(pubdate__icontains=pubdate_filter)  # 部分一致
-    if place_filter:
-        query_filter = query_filter.filter(place__place__icontains=place_filter)  # 部分一致
+        query_filter = query_filter.filter(
+        Q(title__icontains=title_filter) | Q(titlekana__icontains=title_filter)
+    )
 
+    if author_filter:
+        query_filter = query_filter.filter(
+        Q(author__icontains=author_filter) | Q(authorkana__icontains=author_filter)
+    )
+
+    if publisher_filter:
+        query_filter = query_filter.filter(
+        Q(publisher__icontains=publisher_filter) | Q(pubkana__icontains=publisher_filter)
+    )
+
+    if pubdate_filter:
+        query_filter = query_filter.filter(pubdate__icontains=pubdate_filter)
+
+    if place_filter:
+        query_filter = query_filter.filter(place__place__icontains=place_filter)
     params['place'] = Place.objects.all()
 
     # 検索結果があれば、そのデータを使用し、なければすべてのデータを表示
@@ -342,6 +377,8 @@ from django.db.models import Q
 @login_required
 def borrow_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
+    reserves = Lending.objects.order_by('returndate').filter(book=book,is_returned=False)
+    today = datetime.date.today()
 
     if request.method == 'POST':
         form = LendingForm(request.POST)
@@ -374,7 +411,7 @@ def borrow_book(request, pk):
             lending.save()
 
             # 本日借りる場合は貸出状態に
-            if lending.date == datetime.date.today():
+            if lending.date == today:
                 book.is_borrowed = True
                 book.save()
 
@@ -382,7 +419,7 @@ def borrow_book(request, pk):
     else:
         form = LendingForm()
 
-    return render(request, 'books/lending.html', {'form': form, 'book': book})
+    return render(request, 'books/lending.html', {'form': form, 'book': book, 'today':today, 'reserves':reserves})
 
 class LendingDoneView(TemplateView):
     template_name = "books/lending_done.html"
@@ -468,9 +505,9 @@ def borrowed_books_list(request, page=1):
     query_filter = Lending.objects.order_by('returndate').filter(is_returned=False)
 
     if title_filter:
-        query_filter = query_filter.filter(book__title__icontains=title_filter)  # 部分一致
+        query_filter = query_filter.filter(Q(title__icontains=title_filter) | Q(titlekana__icontains=title_filter))  # 部分一致
     if author_filter:
-        query_filter = query_filter.filter(book__author__icontains=author_filter)  # 部分一致
+        query_filter = query_filter.filter(Q(author__icontains=title_filter) | Q(authorkana__icontains=title_filter))  # 部分一致
     if username_filter:
         query_filter = query_filter.filter(username__username__icontains=username_filter)  # 部分一致
     if place_filter:
@@ -497,3 +534,30 @@ def borrowed_books_list(request, page=1):
     # 指定したページのオブジェクトからページリンク先のリストを作っている
     params['data_list'] = params['data_p'].paginator.get_elided_page_range(page, on_each_side=onEachSide, on_ends=onEnds)
     return render(request, 'books/borrowed_books_list.html', params)
+
+@login_required
+def return_book2(request, lending_id):
+    # Lendingオブジェクトを取得
+    lending = get_object_or_404(Lending, id=lending_id)
+    
+    # Lendingのis_returnedをTrueにする
+    lending.is_returned = True
+    lending.returndate = datetime.date.today()
+    lending.save()
+
+    # 対応するBookのis_borrowedをFalseにする
+    book = lending.book
+    book.is_borrowed = False
+    book.save()
+
+    # 返却後、マイページにリダイレクト
+    return redirect('books:borrowed_books_list', page=1)
+
+@login_required
+def cancel_reservation2(request, lending_id):
+    lending = get_object_or_404(Lending, pk=lending_id, username=request.user)
+
+    if lending.date > datetime.date.today():  # 未来の予約のみキャンセル可能
+        lending.delete()
+
+    return redirect('books:borrowed_books_list', page=1)

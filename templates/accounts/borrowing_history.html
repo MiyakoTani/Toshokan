@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-{% if lending_info %}
+{% if data_p %}
 <table class="table">
     <tr>
         <th>タイトル</th>
@@ -15,7 +15,7 @@
         <th>返却日</th>
         <th>レビュー</th>
     </tr>
-    {% for item in lending_info %}
+    {% for item in data_p %}
     <tr>
         <td>{{ item.lending.book.title }}</td>
         <td>{{ item.lending.book.author }}</td>
@@ -31,6 +31,7 @@
     </tr>
     {% endfor %}
 </table>
+{% include 'accounts/page.html' %}
 {% else %}
     <p>現在、貸出履歴はありません。</p>
 {% endif %}

@@ -21,4 +21,6 @@ urlpatterns = [
     path('return_book/<int:lending_id>/', views.return_book, name='return_book'),
     path('add_review/<int:book_id>/', views.add_review, name='add_review'),
     path('borrowed_list/<int:page>', views.borrowed_books_list, name='borrowed_books_list'),
+    path('return_books/<int:lending_id>/', views.return_book2, name='return_books'),
+    path('cancel_reservations/<int:lending_id>/', views.cancel_reservation2, name='cancel_reservations'),
 ]

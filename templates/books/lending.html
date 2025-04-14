@@ -10,6 +10,7 @@
 {% if user.is_authenticated %}
 <div>
   <br>
+  <strong><p>{{ book.title }}</p></strong>
   <form method="POST">
     {% csrf_token %}
 
@@ -18,6 +19,34 @@
     <a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
     <button type="submit" class="btn btn-primary">Borrow</button>
   </form>
+  <br>
+  <p><strong>貸出・予約予定(これらの貸出・予約期間とかぶっている日付を選択することはできません)</strong></p>
+        {% if reserves %}
+        <table class="table table-bordered">
+        <tr>
+            <th>貸出日</th>
+            <th>返却予定日</th>
+            <th>状態</th>
+        </tr>
+        {% for reserve in reserves %}
+        <tr>
+            <td>{{ reserve.date|date:"n月j日" }}</td>
+            <td>{{ reserve.returndate|date:"n月j日" }}</td>
+            <td>    
+                {% if reserve.returndate < today %}
+                    <span style="color: red;">期限切れ</span>
+                {% elif reserve.date > today %}
+                    予約中
+                {% else %}
+                    貸出中
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </table>
+        {% else %}
+        <p>貸出・予約はありません。</p>
+        {% endif %}
   {% else %}
   <p>ログインしてください。</p>
   <a href="{% url 'accounts:index' %}" class="btn btn-secondary">Login</a>

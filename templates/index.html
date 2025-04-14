@@ -20,19 +20,14 @@
         </button>
         <div class="collapse navbar-collapse" id="exampleNavbarToggle">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="/book_search/1">本を探す</a></li>
-                <li class="nav-item"><a class="nav-link" href="/book_shelf/1">本棚</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:borrowing_history' %}">貸出履歴</a></li>
                 <li class="nav-item"><a class="nav-link" href="/borrowed_list/1">書籍の返却</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'books:book_create' %}">書籍登録</a></li>
                 <li class="nav-item"><a class="nav-link" href="/book_manage/1">書籍管理</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'books:place_make' %}">場所登録</a></li>
                 <li class="nav-item"><a class="nav-link" href="/place_delete/1">場所削除</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}">ログアウト</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:password_change' %}">パスワード変更</a></li>
                 <li class="nav-item"><a class="nav-link" href="/staff_search_user/1">ユーザー管理</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:change' %}">アカウント編集</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:delete' %}">アカウント削除</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:not_staff_page' %}">ユーザーページ</a></li>
             </ul>
         </div>
     </div>
@@ -41,7 +36,7 @@
 <div class="p" style="margin-top: 70px;">
     <table class="table">
         <tr><th><td>ユーザーネーム：</td><td>{{ user.username }}</td></th></tr>
-        <tr><th><td>名前：</td><td>{{ user.first_name }} {{ user.last_name }}</td></th></tr>
+        <tr><th><td>名前：</td><td>{{ user.last_name }} {{ user.first_name }}</td></th></tr>
         <tr><th><td>メールアドレス：</td><td>{{ user.email }}</td></th></tr>
     </table>
     <hr>
@@ -111,11 +106,16 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="/book_search/1">本を探す</a></li>
                 <li class="nav-item"><a class="nav-link" href="/book_shelf/1">本棚</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:borrowing_history' %}">貸出履歴</a></li>
+                <li class="nav-item"><a class="nav-link" href="/borrowing_history/1">貸出履歴</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}">ログアウト</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'accounts:password_change' %}">パスワード変更</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'accounts:change' %}">アカウント編集</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:delete' %}">アカウント削除</a></li>
+                <li class="nav-item"><form method="post" action="{% url 'accounts:delete' %}" onsubmit="return confirm('{{ user.username }} を削除しますか？');">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link btn btn-link">
+                        アカウント削除
+                    </button>
+                </form></li>
             </ul>
         </div>
     </div>
@@ -124,7 +124,7 @@
 <div class="p" style="margin-top: 70px;">
     <table class="table">
         <tr><th><td>ユーザーネーム：</td><td>{{ user.username }}</td></th></tr>
-        <tr><th><td>名前：</td><td>{{ user.first_name }} {{ user.last_name }}</td></th></tr>
+        <tr><th><td>名前：</td><td>{{ user.last_name }} {{ user.first_name }}</td></th></tr>
         <tr><th><td>メールアドレス：</td><td>{{ user.email }}</td></th></tr>
     </table>
     <br>
