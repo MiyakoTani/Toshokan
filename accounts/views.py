@@ -1,6 +1,7 @@
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
 from django.views.generic import TemplateView, CreateView, FormView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView as BaseLoginView,  LogoutView as BaseLogoutView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
@@ -8,6 +9,9 @@ from django.urls import reverse_lazy
 from django.core.paginator import Paginator
 from .forms import SignUpForm, LoginForm, MyPasswordChangeForm, UserChangeForm, UserDeleteForm, StaffAccountsChangeForm, ForgetForm, UsernameForm
 from .models import User
+from books.models import Review,Book
+from books.models import Lending
+import datetime
 
 
 
@@ -16,6 +20,46 @@ class IndexView(BaseLoginView):
     form_class = LoginForm
     template_name = "index.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            today = datetime.date.today()
+            # 貸出または予約中の本一覧（未来 or 今日以降）
+            lendings = Lending.objects.filter(
+                username=self.request.user,
+                is_returned=False,
+            ).order_by('date')
+            context['lendings'] = lendings
+            context['today'] = today
+        return context
+    
+def borrowing_history(request):
+    # 現在ログインしているユーザーを取得
+    user = request.user
+    
+    # ユーザーの貸出履歴を取得
+    lendings = Lending.objects.filter(username=user,is_returned=True).order_by('-date')
+    lending_info = []
+
+    for lending in lendings:
+        review = Review.objects.filter(book=lending.book, user=request.user).first()
+        reviews = Review.objects.filter(book=lending.book, user=request.user)
+        lending_info.append({
+            'lending': lending,
+            'review': review,  # Noneなら未レビュー、存在すればレビュー済み
+            'reviews': reviews,
+        })
+
+    return render(request, 'accounts/borrowing_history.html', {'user': request.user,'lending_info': lending_info})
+
+def my_review_detail(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    reviews = Review.objects.filter(book=book, user=request.user).order_by('-created_at')
+
+    return render(request, 'accounts/my_review_detail.html', {
+        'book': book,
+        'reviews': reviews,
+    })
 
 class SignupView(CreateView):
     """ ユーザー登録用ビュー """

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">{{ user.username }}さんの貸出履歴</div>
+{% endblock %}
+
+{% block content %}
+{% if lending_info %}
+<table class="table">
+    <tr>
+        <th>タイトル</th>
+        <th>著者</th>
+        <th>貸出日</th>
+        <th>返却日</th>
+        <th>レビュー</th>
+    </tr>
+    {% for item in lending_info %}
+    <tr>
+        <td>{{ item.lending.book.title }}</td>
+        <td>{{ item.lending.book.author }}</td>
+        <td>{{ item.lending.date }}</td>
+        <td>{{ item.lending.returndate }}</td>
+        <td>
+            {% if item.review %}
+                <a href="{% url 'accounts:my_review' item.lending.book.pk %}" class="btn btn-outline-primary btn-sm">自分のレビューを見る</a>
+            {% else %}
+                <a href="{% url 'books:add_review' item.lending.book.id %}" class="btn btn-primary btn-sm">レビューを投稿</a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>現在、貸出履歴はありません。</p>
+{% endif %}
+<a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+{% endblock %}

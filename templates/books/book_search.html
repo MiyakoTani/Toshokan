@@ -3,7 +3,7 @@
 
 
 {% block title %}
-<div class="h1">検索</div>
+<div class="h1">検索　<a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a></div>
 {% endblock %}
 
 {% block content %}
@@ -39,7 +39,7 @@
 </form>
 
 <hr>
-<table class="table">
+<table class="table table-hover">
     <tr>
         <th>書影</th>
         <th>タイトル</th>
@@ -47,7 +47,7 @@
     </tr>
     {% for item in data_p %}
     <tr style="height: 120px;">
-        <td><img src="{{item.cover}}" alt="カバー画像" height="100px" />
+        <td><a href="{% url 'books:book_detail' item.pk %}"><img src="{{item.cover}}" alt="カバー画像" height="100px" /></a>
             <p>
             {% if item.is_borrowed %} <span class="bg-danger p-1 text-dark" style="--bs-bg-opacity: 8%"> 貸出中 
             {% else %} <span class="bg-success p-1 text-dark" style="--bs-bg-opacity: 8%"> 貸出可 
@@ -56,10 +56,13 @@
         </td>
         <td>{{item.title}}</td>
         <td>{{item.author}}</td>
-        <td><a href="{% url 'books:book_detail' item.pk %}" class="btn btn-primary">借りる</a></td>
+        <td>{% if item.is_borrowed %}<a href="{% url 'books:book_detail' item.pk %}" class="btn btn-primary">予約</a>
+            {% else %}<a href="{% url 'books:book_detail' item.pk %}" class="btn btn-primary">借りる</a>
+            {% endif %}
+        </td>
     </tr>
     {% endfor %}
 </table>
 {% include 'accounts/page.html' %}
-<a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+
 {% endblock %}

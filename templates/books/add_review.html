@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">{{ book.title }}のレビューを投稿</div>
+{% endblock %}
+
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+        
+    <!-- 星評価 -->
+    <div class="rating">
+        <label for="rating">評価</label><br>
+        <div class="stars" id="stars">
+            <span class="star" data-value="1">★</span>
+            <span class="star" data-value="2">★</span>
+            <span class="star" data-value="3">★</span>
+            <span class="star" data-value="4">★</span>
+            <span class="star" data-value="5">★</span>
+        </div>
+        <input type="hidden" name="rating" id="rating" value="0">
+    </div>
+    <!-- レビュー本文 -->
+    <div class="form-group">
+        <label for="review_text" class="form-label">本文</label>
+        <textarea class="form-control" name="review_text" rows="5" value="{{ request.POST.review_text }}"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">レビューを投稿</button>
+</form>
+<a href="{% url 'accounts:borrowing_history' %}" class="btn btn-secondary mt-2">Back</a>
+</div>
+
+<!-- 星評価のためのCSSとJS -->
+<style>
+    .stars {
+        display: inline-block;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+    .star {
+        color: gray;
+        transition: color 0.3s;
+    }
+    .star.checked {
+        color: gold;
+    }
+    </style>
+    
+    <script>
+    // 星の選択を管理するJavaScript
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('rating');
+    
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            // クリックされた星のインデックスを取得
+            const rating = star.getAttribute('data-value');
+            
+            // 選ばれた評価をinputに設定
+            ratingInput.value = rating;
+            
+            // 全ての星の色をリセット
+            stars.forEach(s => s.classList.remove('checked'));
+            
+            // 選ばれた星をゴールドにする
+            for (let i = 0; i < rating; i++) {
+                stars[i].classList.add('checked');
+            }
+        });
+    
+        star.addEventListener('mouseover', () => {
+            const rating = star.getAttribute('data-value');
+            stars.forEach((s, index) => {
+                if (index < rating) {
+                    s.classList.add('checked');
+                } else {
+                    s.classList.remove('checked');
+                }
+            });
+        });
+    
+        star.addEventListener('mouseout', () => {
+            stars.forEach(s => s.classList.remove('checked'));
+            const currentRating = ratingInput.value;
+            for (let i = 0; i < currentRating; i++) {
+                stars[i].classList.add('checked');
+            }
+        });
+    });
+    </script>
+{% endblock %}

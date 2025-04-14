@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
 {% block title %}
-    <div class="h1">{{ book.title }}　<a href="#" class="btn btn-primary btn-lg">借りる</a></div>  
+    <div class="h1">{{ book.title }}　
+    {% if not book.is_borrowed %}<a href="{% url 'books:borrow' book.pk %}" class="btn btn-primary btn-lg">借りる</a>
+    {% else %}<a href="{% url 'books:borrow' book.pk %}" class="btn btn-primary btn-lg">予約</a>
+    {% endif %}<button type="button" class="btn btn-secondary btn-lg" onClick="javascript:history.go(-1);">Back</button></div>
 {% endblock %}
 
 {% block content %}
@@ -14,7 +17,7 @@
 
 </p>
 <div class="container-fluid">
-    <div class="row row-cols-auto">
+  <div class="row row-cols-auto">
       <div class="col-auto my-box">
         <img src="{{book.cover}}" alt="カバー画像" width="200" style="float: left;" /><br>
         
@@ -30,9 +33,35 @@
             <tr><th><td><strong>出版日：</strong></td><td>{{ book.pubdate }}</td></th></tr>
         </table>
     </div>
-    </div>
   </div>
-  <button type="button" class="btn btn-secondary mt-2" onClick="javascript:history.go(-1);">Back</button>
+  
+  <br>
+{% if reviews %}
+<p><strong>この本に対するレビュー</strong></p>
+    {% for review in reviews %}
+    <div class="card mb-3">
+        <div class="card-header">
+            投稿者: {{ review.user.username }} 投稿日: {{ review.created_at|date:"Y年m月d日 H:i" }}
+        </div>
+        <div class="card-body">
+            <p><strong>評価:</strong><br>
+            {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}
+                    ★
+                {% else %}
+                    ☆
+                {% endif %}
+            {% endfor %}
+            </p>
+            <p><strong>本文:</strong><br>{{ review.review_text }}</p>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>この本に対するレビューはまだありません。</p>
+{% endif %}
+</div>
+  
 </div>
 
 {% endblock %}

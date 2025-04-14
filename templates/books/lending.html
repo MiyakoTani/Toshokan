@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">Borrow book</div>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<div>
+  <br>
+  <form method="POST">
+    {% csrf_token %}
+
+    {% bootstrap_form form layout='horizontal' %}
+
+    <a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn btn-primary">Borrow</button>
+  </form>
+  {% else %}
+  <p>ログインしてください。</p>
+  <a href="{% url 'accounts:index' %}" class="btn btn-secondary">Login</a>
+  {% endif %}
+  {% endblock %}

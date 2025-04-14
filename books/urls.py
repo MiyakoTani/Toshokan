@@ -15,4 +15,10 @@ urlpatterns = [
     path('book_update/<int:pk>/', views.BookUpdateView.as_view(), name='book_update'),
     path('book_search/<int:page>', views.book_search, name="book_search"),
     path('book_shelf/<int:page>', views.book_shelf, name="book_shelf"),
+    path('borrow/<int:pk>/', views.borrow_book, name="borrow"),
+    path('lending_done', views.LendingDoneView.as_view(), name='lending_done'),
+    path('cancel_reservation/<int:lending_id>/', views.cancel_reservation, name='cancel_reservation'),
+    path('return_book/<int:lending_id>/', views.return_book, name='return_book'),
+    path('add_review/<int:book_id>/', views.add_review, name='add_review'),
+    path('borrowed_list/<int:page>', views.borrowed_books_list, name='borrowed_books_list'),
 ]

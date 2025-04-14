@@ -20,7 +20,10 @@
         </button>
         <div class="collapse navbar-collapse" id="exampleNavbarToggle">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="#">書籍の返却</a></li>
+                <li class="nav-item"><a class="nav-link" href="/book_search/1">本を探す</a></li>
+                <li class="nav-item"><a class="nav-link" href="/book_shelf/1">本棚</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:borrowing_history' %}">貸出履歴</a></li>
+                <li class="nav-item"><a class="nav-link" href="/borrowed_list/1">書籍の返却</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'books:book_create' %}">書籍登録</a></li>
                 <li class="nav-item"><a class="nav-link" href="/book_manage/1">書籍管理</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'books:place_make' %}">場所登録</a></li>
@@ -41,7 +44,56 @@
         <tr><th><td>名前：</td><td>{{ user.first_name }} {{ user.last_name }}</td></th></tr>
         <tr><th><td>メールアドレス：</td><td>{{ user.email }}</td></th></tr>
     </table>
-
+    <hr>
+<h3>予約・貸出中の本</h3>
+{% if lendings %}
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>タイトル</th>
+            <th>著者</th>
+            <th>開始日</th>
+            <th>返却日</th>
+            <th>状態</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lending in lendings %}
+        <tr>
+            <td>{{ lending.book.title }}</td>
+            <td>{{ lending.book.author }}</td>
+            <td>{{ lending.date }}</td>
+            <td>{{ lending.returndate }}</td>
+            <td>    
+                {% if lending.returndate < today %}
+                    <span style="color: red;">期限切れ</span>
+                {% elif lending.date > today %}
+                    予約中
+                {% else %}
+                    貸出中
+                {% endif %}
+            </td>
+            <td>
+                {% if lending.date > today %}
+                <form method="post" action="{% url 'books:cancel_reservation' lending.id %}" style="display:inline;" onsubmit="return confirm('{{ lending.book.title }}の予約をキャンセルしますか？');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">キャンセル</button>
+                </form>
+                {% else %}
+                <form method="post" action="{% url 'books:return_book' lending.id %}" style="display:inline;" onsubmit="return confirm('{{ lending.book.title }}を返却しますか？');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-sm">返　却　</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>現在の予約・貸出中の本はありません。</p>
+{% endif %}
 </div>
 
 
@@ -59,8 +111,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="/book_search/1">本を探す</a></li>
                 <li class="nav-item"><a class="nav-link" href="/book_shelf/1">本棚</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">返却</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">貸出履歴</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:borrowing_history' %}">貸出履歴</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}">ログアウト</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'accounts:password_change' %}">パスワード変更</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'accounts:change' %}">アカウント編集</a></li>
@@ -77,6 +128,56 @@
         <tr><th><td>メールアドレス：</td><td>{{ user.email }}</td></th></tr>
     </table>
     <br>
+    <hr>
+<h3>予約・貸出中の本</h3>
+{% if lendings %}
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>タイトル</th>
+            <th>著者</th>
+            <th>開始日</th>
+            <th>返却日</th>
+            <th>状態</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lending in lendings %}
+        <tr>
+            <td>{{ lending.book.title }}</td>
+            <td>{{ lending.book.author }}</td>
+            <td>{{ lending.date }}</td>
+            <td>{{ lending.returndate }}</td>
+            <td>
+                {% if lending.returndate < today %}
+                    <span style="color: red;">期限切れ</span>
+                {% elif lending.date > today %}
+                    予約中
+                {% else %}
+                    貸出中
+                {% endif %}
+            </td>
+            <td>
+                {% if lending.date > today %}
+                <form method="post" action="{% url 'books:cancel_reservation' lending.id %}" style="display:inline;" onsubmit="return confirm('{{ lending.book.title }}の予約をキャンセルしますか？');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">キャンセル</button>
+                </form>
+                {% else %}
+                <form method="post" action="{% url 'books:return_book' lending.id %}" style="display:inline;" onsubmit="return confirm('{{ lending.book.title }}を返却しますか？');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-sm">返　却　</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>現在の予約・貸出中の本はありません。</p>
+{% endif %}
 {% else %}
 <form method="post">
     <br>

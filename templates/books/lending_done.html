@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">Borrow book</div>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<div>
+    <br>
+    <h3>Thanks For Borrowing The Book</h3>
+    <p>{{ lending.date }}になりましたら、{{ lending.book.place }}で本を受け取ってください。</p>
+    <a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+  {% else %}
+  <p>ログインしてください。</p>
+  <a href="{% url 'accounts:index' %}" class="btn btn-secondary">Login</a>
+  {% endif %}
+  {% endblock %}

@@ -7,26 +7,36 @@
 
 {% block content %}
 <br><p>貸出可能な本をランダムに表示しています。画像をクリックすると本の詳細を見ることが出来ます。</p>
-<div class="container-fluid">
-    <div class="row gy-2">
-        {% for item in data_p %}
-        <div class="col my-box">
-        <th><td>
-        {% if not item.is_borrowed %}
-            {% if item.cover %}
-            <a href="{% url 'books:book_detail' item.pk %}"><img src="{{item.cover}}" alt="カバー画像" title="{{item.title}}" width="100" /></a>
-            {% else %}
-            <div  style="width:100px;"><a href="{% url 'books:book_detail' item.pk %}" title="{{item.title}}">{{ item.title|slice:":7" }}</a></div>
-            {% endif %}
-        {% endif %}
-        </td></th>
-        </div>
-        {% endfor %}
-        </tr>
-        </table>
-    </div>
-</div>
-<br>
-{% include 'accounts/page.html' %}
 
+<div class="container-fluid">
+    <div class="table-responsive">
+    <table class="table">
+        <tbody>
+            <tr>
+                {% for item in data_p %}
+                {% if not item.is_borrowed %}
+                
+                <td style="width: 80px; text-align: center;">
+                    {% if item.cover %}
+                    <a href="{% url 'books:book_detail' item.pk %}">
+                        <img src="{{ item.cover }}" alt="カバー画像" title="{{ item.title }}" style="height: 113px; object-fit: cover;">
+                    </a>
+                    {% else %}
+                    <a href="{% url 'books:book_detail' item.pk %}" title="{{ item.title }}">{{ item.title|slice:":7" }}
+                    {% endif %}
+                </td>
+
+                {% if forloop.counter|divisibleby:10 and not forloop.last %}
+                </tr><tr>
+                {% endif %}
+
+                {% endif %}
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+    </div>
+    <br>
+    {% include 'accounts/page.html' %}
+</div>
 {% endblock %}

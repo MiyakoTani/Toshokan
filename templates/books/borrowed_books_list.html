@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap5 %}
+
+{% block title %}
+<div class="h1">貸出中の本リスト</div>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.is_staff %}
+<br>
+<form method="POST">
+    {% csrf_token %}
+    <div class="container-fluid">
+    <div class="row row-cols-auto">
+    <div class="col-auto my-box">
+    <label for="title" class="form-label">タイトル</label>
+    <input type="text" class="form-control" name="title" value="{{ request.POST.title }}"></div>
+    <div class="col-auto my-box">
+    <label for="author" class="form-label">著者</label>
+    <input type="text" class="form-control" name="author" value="{{ request.POST.author }}"></div>
+    <div class="col-auto my-box">
+    <label for="username" class="form-label">ユーザーネーム</label>
+    <input type="text" class="form-control" name="username" value="{{ request.POST.username }}"></div>
+    <div class="col-auto my-box">
+    <label for="place" class="form-label">場所</label>
+    <input type="text" class="form-control" name="place" value="{{ request.POST.place }}"></div>
+    <div class="col-auto my-box">
+    <label for="status" class="form-label">状態</label>
+    <select class="form-control" name="status">
+        <option value="">-- 状態を選択 --</option>
+        <option value="expired" {% if request.POST.status == 'expired' %}selected{% endif %}>期限切れ</option>
+        <option value="reserved" {% if request.POST.status == 'reserved' %}selected{% endif %}>予約中</option>
+        <option value="borrowed" {% if request.POST.status == 'borrowed' %}selected{% endif %}>貸出中</option>
+    </select>
+    </div>
+</div>
+    <button type="submit" class="btn btn-secondary mt-2">Search</button>
+    </div>
+</form>
+<br>
+<div class="container">
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>タイトル</th>
+                <th>著者</th>
+                <th>利用者</th>
+                <th>貸出日</th>
+                <th>返却予定日</th>
+                <th>状態</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lending in data_p %}
+            <tr>
+                <td>{{ lending.book.title }}</td>
+                <td>{{ lending.book.author }}</td>
+                <td>{{ lending.username.username }}</td>
+                <td>{{ lending.date }}</td>
+                <td>{{ lending.returndate }}</td>
+                <td>    
+                    {% if lending.returndate < today %}
+                        <span style="color: red;">期限切れ</span>
+                    {% elif lending.date > today %}
+                        予約中
+                    {% else %}
+                        貸出中
+                    {% endif %}
+                </td>
+                <td>
+                    {% if lending.date > today %}
+                    <form method="post" action="{% url 'books:cancel_reservation' lending.id %}" style="display:inline;" onsubmit="return confirm('{{ lending.book.title }}の予約をキャンセルしますか？');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">キャンセル</button>
+                    </form>
+                    {% else %}
+                    <form method="post" action="{% url 'books:return_book' lending.id %}" style="display:inline;" onsubmit="return confirm('{{ lending.book.title }}を返却しますか？');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-sm">返　却　</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted">現在、貸出中の本はありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% include 'accounts/page.html' %}
+    <a href="{% url 'accounts:index' %}" class="btn btn-secondary">Back</a>
+</div>
+{% else %}
+<p>権限がありません。</p>
+<a href="{% url 'accounts:index' %}" class="btn btn-secondary">ホームに戻る</a>
+{% endif %}
+{% endblock %}

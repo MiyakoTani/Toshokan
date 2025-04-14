@@ -20,4 +20,6 @@ urlpatterns = [
     path('password_reset_complete/', views.PasswordResetCompleteView.as_view(), name='password_reset_complete'), #追加
     path('username_reset/', views.UsernameResetView.as_view(), name='username_reset'), #追加
     path('username_reset_done/', views.UsernameResetDoneView.as_view(), name='username_reset_done'),
+    path('borrowing_history/', views.borrowing_history, name='borrowing_history'),
+    path('review/<int:pk>/', views.my_review_detail, name='my_review')
 ]
