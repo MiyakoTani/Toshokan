@@ -15,23 +15,6 @@ from books.models import Review,Book
 from books.models import Lending
 import datetime
 
-class NotStaffView(TemplateView):
-    """ ホームビュー """
-    template_name = "accounts/not_staff_page.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            today = datetime.date.today()
-            # 貸出または予約中の本一覧（未来 or 今日以降）
-            lendings = Lending.objects.filter(
-                username=self.request.user,
-                is_returned=False,
-            ).order_by('date')
-            context['lendings'] = lendings
-            context['today'] = today
-        return context
-
 class IndexView(BaseLoginView):
     """ ホームビュー """
     form_class = LoginForm
@@ -91,7 +74,7 @@ def borrowing_history(request, page=1):
 
 def my_review_detail(request, pk):
     book = get_object_or_404(Book, pk=pk)
-    reviews = Review.objects.filter(book=book, user=request.user).order_by('-created_at')
+    reviews = Review.objects.get(book=book, user=request.user)
 
     return render(request, 'accounts/my_review_detail.html', {
         'book': book,

@@ -32,8 +32,16 @@
             <tr><th>シリーズ：<td>{{ book.series }}</td></th></tr>
             <tr><th>出版社：<td>{{ book.publisher }}</td></th></tr>
             <tr><th>出版日：<td>{{ book.pubdate }}</td></th></tr>
+            <tr>
+              <th>概要：</th>
+              <td>
+                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                  表示
+                </button>
+              </td>
+            </tr>
         </table>
-    </div>
+        </div>
     <div class="col-auto my-box">
         <p><strong>貸出・予約予定</strong></p>
         {% if reserves %}
@@ -64,7 +72,12 @@
         {% endif %}
     </div>   
   </div>
-  
+  <div id="collapseOne" class="accordion-collapse collapse mt-2" aria-labelledby="headingOne" data-bs-parent="#myAccordion">
+    <div class="accordion-body border p-3">
+      {% if book.description %}{{ book.description }}
+      {% else %}この本の概要は登録されていません。{% endif %}
+    </div>
+  </div>
   <br>
 {% if reviews %}
 <p><strong>この本に対するレビュー</strong></p>

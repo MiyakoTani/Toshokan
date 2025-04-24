@@ -170,6 +170,13 @@ def get_book_data(isbn):
             # 出版社の読み仮名
             pubkana = hanmoto.get("hanmotoinfo", {}).get("yomi", "")
 
+            description = ""
+            text_contents = onix.get("CollateralDetail", {}).get("TextContent", [])
+            for text in text_contents:
+                if text.get("TextType") == "03":  # 03 = 内容紹介
+                    description = text.get("Text", "")
+                    break
+
             return {
                 "title": summary.get("title", ""),
                 "titlekana": titlekana,
@@ -179,7 +186,8 @@ def get_book_data(isbn):
                 "pubkana": pubkana,
                 "pubdate": summary.get("pubdate", ""),
                 "cover": summary.get("cover", ""),
-                "isbn": summary.get("isbn", "")
+                "isbn": summary.get("isbn", ""),
+                "description": description
             }
 
     return None
@@ -475,7 +483,7 @@ def add_review(request, book_id):
             rating=rating
         )
 
-        return redirect('accounts:borrowing_history')  # レビュー投稿後、貸出履歴ページに戻る
+        return redirect('accounts:borrowing_history', page=1)  # レビュー投稿後、貸出履歴ページに戻る
 
     return render(request, 'books/add_review.html', {'book': book})
 

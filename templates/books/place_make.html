@@ -10,7 +10,7 @@
 {% if user.is_authenticated and user.is_staff %}
 <div>
   <br>
-  <form method="POST">
+  <form method="POST" autocomplete="off">
     {% csrf_token %}
 
     {% bootstrap_form form layout='horizontal' %}

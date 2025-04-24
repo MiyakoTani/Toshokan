@@ -31,6 +31,7 @@ class BookForm(forms.ModelForm):
             "pubdate",
             "cover",
             "place",
+            "description",
         )
 
 class BookUpdateForm(forms.ModelForm):
@@ -49,6 +50,7 @@ class BookUpdateForm(forms.ModelForm):
             "pubdate",
             "cover",
             "place",
+            "description",
         )
         labels={
            "isbn":"ISBN",
@@ -60,6 +62,7 @@ class BookUpdateForm(forms.ModelForm):
             "pubdate":"出版日",
             "cover":"書影",
             "place":"本棚の場所",
+            "description":"概要",
            }
 
 from django.utils import timezone
@@ -88,21 +91,29 @@ class LendingForm(forms.ModelForm):
         returndate = self.cleaned_data.get('returndate')
         date = self.cleaned_data.get('date')
 
+        # dateやreturndateがNoneの場合をチェック
+        if not returndate or not date:
+            raise forms.ValidationError('貸出開始日と返却日を正しく入力してください。')
 
+        # 貸出開始日と返却日を比較
         if returndate < date:
             raise forms.ValidationError('返却日は貸出開始日より後の日付でなければなりません。')
 
-        # 返却日は貸出日から14日以内とする
+        # 返却日は貸出日から14日以内
         if (returndate - date).days > 14:
             raise forms.ValidationError('返却日は貸出日から14日以内でなければなりません。')
 
         return returndate
     
     def clean_date(self):
-        today = datetime.date.today()
+        today = timezone.localdate()  # タイムゾーンを考慮した今日の日付
         date = self.cleaned_data.get('date')
 
-        
+        # dateがNoneの場合をチェック
+        if not date:
+            raise forms.ValidationError('貸出日を正しく入力してください。')
+
+        # 貸出日が本日以降であることをチェック
         if date < today:
             raise forms.ValidationError('貸出日は本日以降の日付でなければなりません。')
 

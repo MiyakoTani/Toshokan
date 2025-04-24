@@ -5,7 +5,6 @@ app_name = "accounts"
 
 urlpatterns = [
     path("", views.IndexView.as_view(), name="index"),
-    path("not_staff_page", views.NotStaffView.as_view(), name="not_staff_page"),
     path('signup/', views.SignupView.as_view(), name="signup"),
     path('logout/', views.LogoutView.as_view(), name="logout"),
     path('password_change/', views.PasswordChange.as_view(), name='password_change'), # パスワード変更

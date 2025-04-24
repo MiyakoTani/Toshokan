@@ -25,9 +25,25 @@
                 <li class="nav-item"><a class="nav-link" href="/book_manage/1">書籍管理</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'books:place_make' %}">場所登録</a></li>
                 <li class="nav-item"><a class="nav-link" href="/place_delete/1">場所削除</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}">ログアウト</a></li>
                 <li class="nav-item"><a class="nav-link" href="/staff_search_user/1">ユーザー管理</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:not_staff_page' %}">ユーザーページ</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}">ログアウト</a></li>
+                <li class="nav-item"><div class="dropdown">
+                    <button class="nav-link btn btn-link dropdown-toggle" type="button"
+                        id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">ユーザーメニュー</button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="/book_search/1">本を探す</a></li>
+                        <li><a class="dropdown-item" href="/book_shelf/1">本棚</a></li>
+                        <li><a class="dropdown-item" href="/borrowing_history/1">貸出履歴</a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:password_change' %}">パスワード変更</a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:change' %}">アカウント編集</a></li>
+                        <li><form method="post" action="{% url 'accounts:delete' %}" onsubmit="return confirm('{{ user.username }} を削除しますか？');">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item btn btn-link">
+                        アカウント削除
+                        </button>
+                        </form></li>
+                    </ul>
+                  </div></li>
             </ul>
         </div>
     </div>
@@ -39,6 +55,7 @@
         <tr><th><td>名前：</td><td>{{ user.last_name }} {{ user.first_name }}</td></th></tr>
         <tr><th><td>メールアドレス：</td><td>{{ user.email }}</td></th></tr>
     </table>
+    <br>
     <hr>
 <h3>予約・貸出中の本</h3>
 {% if lendings %}
