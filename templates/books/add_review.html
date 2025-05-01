@@ -48,6 +48,24 @@
     </style>
     
     <script>
+    //星の選択必須
+    document.querySelector("form").addEventListener("submit", function (e) {
+    const ratingValue = parseInt(document.getElementById("rating").value);
+    const reviewText = document.querySelector('textarea[name="review_text"]').value;
+
+    if (ratingValue < 1) {
+        alert("評価は1以上を選択してください。");
+        e.preventDefault();
+        return;
+    }
+
+    if (reviewText.length > 1000) {
+        alert("レビュー本文は1000文字以内で入力してください。");
+        e.preventDefault();
+        return;
+    }
+    });
+
     // 星の選択を管理するJavaScript
     const stars = document.querySelectorAll('.star');
     const ratingInput = document.getElementById('rating');

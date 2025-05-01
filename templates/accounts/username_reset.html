@@ -3,11 +3,11 @@
 {% load django_bootstrap5 %}
 
 {% block title %}
-<div class="h1">Username Reset</div>
+<div class="h1">Send Username</div>
 {% endblock %}
 
 {% block content %}
-<form action="" method="POST">
+<form action="" method="POST" autocomplete="off">
     {{ form.non_field_errors }}
     <br>
     {% bootstrap_form form layout='horizontal' %}

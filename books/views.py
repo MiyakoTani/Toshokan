@@ -563,7 +563,7 @@ def return_book2(request, lending_id):
 
 @login_required
 def cancel_reservation2(request, lending_id):
-    lending = get_object_or_404(Lending, pk=lending_id, username=request.user)
+    lending = get_object_or_404(Lending, pk=lending_id)
 
     if lending.date > datetime.date.today():  # 未来の予約のみキャンセル可能
         lending.delete()

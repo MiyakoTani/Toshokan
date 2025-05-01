@@ -45,7 +45,7 @@ class Review(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="reviews")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     review_text = models.TextField(max_length=1000)
-    rating = models.PositiveIntegerField(default=5)  # 評価(1～5)
+    rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)],default=5)  # 評価(1～5)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

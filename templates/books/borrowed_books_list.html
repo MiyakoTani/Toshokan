@@ -55,8 +55,8 @@
         <tbody>
             {% for lending in data_p %}
             <tr>
-                <td>{{ lending.book.title }}</td>
-                <td>{{ lending.book.author }}</td>
+                <td>{{ lending.book.title|truncatechars:20 }}</td>
+                <td>{{ lending.book.author|truncatechars:20 }}</td>
                 <td>{{ lending.username.username }}</td>
                 <td>{{ lending.date }}</td>
                 <td>{{ lending.returndate }}</td>
