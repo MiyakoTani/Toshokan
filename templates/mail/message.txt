@@ -1,4 +1,4 @@
-{{ user.lastname }} 様
+{{ user.last_name }} 様
 
 下記URLよりサイトにアクセスの上、パスワードの再設定を行ってください。
 
