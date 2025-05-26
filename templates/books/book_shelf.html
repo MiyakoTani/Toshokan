@@ -6,20 +6,20 @@
 {% endblock %}
 
 {% block content %}
-<br><p>貸出可能な本をランダムに表示しています。画像をクリックすると本の詳細を見ることが出来ます。</p>
+<br><p>貸出可能な本をランダムに30冊表示しています。画像をクリックすると本の詳細を見ることが出来ます。</p>
 
 <div class="container-fluid">
     <div class="table-responsive">
     <table class="table">
         <tbody>
             <tr>
-                {% for item in data_p %}
+                {% for item in data %}
                 {% if not item.is_borrowed %}
                 
                 <td style="width: 80px; text-align: center;">
                     {% if item.cover %}
                     <a href="{% url 'books:book_detail' item.pk %}">
-                        <img src="{{ item.cover }}" alt="カバー画像" title="{{ item.title }}" style="height: 113px; object-fit: cover;">
+                        <img src="{{ item.cover }}" alt="カバー画像" title="{{ item.title }}" style="height: 113px; width: 80px; object-fit: contain;">
                     </a>
                     {% else %}
                     <a href="{% url 'books:book_detail' item.pk %}" title="{{ item.title }}">{{ item.title|slice:":7" }}
@@ -36,7 +36,6 @@
         </tbody>
     </table>
     </div>
-    <br>
-    {% include 'accounts/page.html' %}
+    <br><br>
 </div>
 {% endblock %}

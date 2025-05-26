@@ -12,7 +12,7 @@
 <div class="container-fluid">
     <div class="row row-cols-auto">
       <div class="col-auto my-box">
-<form method="POST">
+<form method="GET">
     {% csrf_token %}
 
     <label for="exampleDataList" class="form-label">ID</label>
@@ -25,11 +25,11 @@
 
     <div class="col-auto my-box">
     <label for="title" class="form-label">タイトル</label>
-    <input type="text" class="form-control" name="title" value="{{ request.POST.title }}"></div>
+    <input type="text" class="form-control" name="title" value="{{ request.GET.title }}"></div>
 
     <div class="col-auto my-box">
     <label for="place" class="form-label">場所</label>
-    <input type="text" class="form-control" name="place" value="{{ request.POST.place }}"></div>
+    <input type="text" class="form-control" name="place" value="{{ request.GET.place }}"></div>
 </div>
 
     <button type="submit" class="btn btn-secondary mt-2">Search</button>

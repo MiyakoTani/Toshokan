@@ -11,14 +11,16 @@
     <tr>
         <th>タイトル</th>
         <th>著者</th>
+        <th>場所</th>
         <th>貸出日</th>
         <th>返却日</th>
         <th>レビュー</th>
     </tr>
     {% for item in data_p %}
     <tr>
-        <td>{{ item.lending.book.title }}</td>
-        <td>{{ item.lending.book.author }}</td>
+        <td>{{ item.lending.book.title|truncatechars:20 }}</td>
+        <td>{{ item.lending.book.author|truncatechars:20 }}</td>
+        <td>{{ item.lending.book.place }}</td>
         <td>{{ item.lending.date }}</td>
         <td>{{ item.lending.returndate }}</td>
         <td>

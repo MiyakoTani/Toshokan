@@ -9,29 +9,29 @@
 {% block content %}
 {% if user.is_authenticated and user.is_staff %}
 <br>
-<form method="POST">
+<form method="get">
     {% csrf_token %}
     <div class="container-fluid">
     <div class="row row-cols-auto">
     <div class="col-auto my-box">
     <label for="title" class="form-label">タイトル</label>
-    <input type="text" class="form-control" name="title" value="{{ request.POST.title }}"></div>
+    <input type="text" class="form-control" name="title" value="{{ request.GET.title }}"></div>
     <div class="col-auto my-box">
     <label for="author" class="form-label">著者</label>
-    <input type="text" class="form-control" name="author" value="{{ request.POST.author }}"></div>
+    <input type="text" class="form-control" name="author" value="{{ request.GET.author }}"></div>
     <div class="col-auto my-box">
     <label for="username" class="form-label">ユーザーネーム</label>
-    <input type="text" class="form-control" name="username" value="{{ request.POST.username }}"></div>
+    <input type="text" class="form-control" name="username" value="{{ request.GET.username }}"></div>
     <div class="col-auto my-box">
     <label for="place" class="form-label">場所</label>
-    <input type="text" class="form-control" name="place" value="{{ request.POST.place }}"></div>
+    <input type="text" class="form-control" name="place" value="{{ request.GET.place }}"></div>
     <div class="col-auto my-box">
     <label for="status" class="form-label">状態</label>
     <select class="form-control" name="status">
         <option value="">-- 状態を選択 --</option>
-        <option value="expired" {% if request.POST.status == 'expired' %}selected{% endif %}>期限切れ</option>
-        <option value="reserved" {% if request.POST.status == 'reserved' %}selected{% endif %}>予約中</option>
-        <option value="borrowed" {% if request.POST.status == 'borrowed' %}selected{% endif %}>貸出中</option>
+        <option value="expired" {% if request.GET.status == 'expired' %}selected{% endif %}>期限切れ</option>
+        <option value="reserved" {% if request.GET.status == 'reserved' %}selected{% endif %}>予約中</option>
+        <option value="borrowed" {% if request.GET.status == 'borrowed' %}selected{% endif %}>貸出中</option>
     </select>
     </div>
 </div>

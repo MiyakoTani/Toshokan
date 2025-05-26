@@ -16,7 +16,8 @@ class Place_make_View(CreateView):
     template_name = "books/place_make.html"
     success_url = reverse_lazy("books:place_make")
     
-def PlaceDelete(request, page=1):
+def PlaceDelete(request):
+    page = int(request.GET.get('page', 1))
     params = {
         'data':[],
         'data_p':[],
@@ -55,16 +56,22 @@ def PlaceDelete(request, page=1):
             
     return render(request,'books/place_delete.html', params)
 
+from urllib.parse import urlencode
+
 class PlaceDeleteView(DeleteView):
     template_name = "books/place_change.html"
     model = Place
-    success_url = reverse_lazy('books:place_delete', args=[1])
+
+    def get_success_url(self):
+        base_url = reverse('books:place_delete')
+        query_string = urlencode({'page': 1})
+        return f'{base_url}?{query_string}'
 
     def post(self, request, *args, **kwargs):
         try:
             obj = self.get_object()
             obj.delete()
-            return HttpResponseRedirect(self.success_url)
+            return HttpResponseRedirect(self.get_success_url())
         except models.ProtectedError as e:
             messages.error(request, f'「{obj}」の本棚にはまだ本があります。')
 
@@ -240,7 +247,8 @@ class BookDetailView(DetailView):
         context['today'] = datetime.date.today()
         return context
         
-def book_manage(request, page=1):
+def book_manage(request):
+    page = int(request.GET.get('page', 1))
     params = {
         'data': [],
         'data_p': [],
@@ -252,9 +260,9 @@ def book_manage(request, page=1):
     onEnds = 2  # 左右両端には2コ表示する
 
     # フィルタリングのための検索パラメータを取得
-    id_filter = request.POST.get('id', '')
-    title_filter = request.POST.get('title', '')
-    place_filter = request.POST.get('place', '')
+    id_filter = request.GET.get('id', '')
+    title_filter = request.GET.get('title', '')
+    place_filter = request.GET.get('place', '')
 
     # フィルタリングの条件を作成
     query_filter = Book.objects.all()
@@ -281,20 +289,32 @@ def book_manage(request, page=1):
     # 指定したページのオブジェクトからページリンク先のリストを作っている
     params['data_list'] = params['data_p'].paginator.get_elided_page_range(page, on_each_side=onEachSide, on_ends=onEnds)
 
+    get_params = request.GET.copy()
+    if 'page' in get_params:
+        get_params.pop('page')
+    params['query_string'] = get_params.urlencode()
+
     return render(request, 'books/book_manage.html', params)
 
 class BookDeleteView(DeleteView):
     template_name = "books/book_delete.html"
     model = Book
-    success_url = reverse_lazy('books:book_manage', args=[1])
+    def get_success_url(self):
+        base_url = reverse('books:book_manage')
+        query_string = urlencode({'page': 1})
+        return f'{base_url}?{query_string}'
 
 class BookUpdateView(UpdateView):
     form_class = BookUpdateForm
     model = Book
     template_name = "books/book_update.html"
-    success_url = reverse_lazy('books:book_manage', args=[1])
+    def get_success_url(self):
+        base_url = reverse('books:book_manage')
+        query_string = urlencode({'page': 1})
+        return f'{base_url}?{query_string}'
 
-def book_search(request, page=1):
+def book_search(request):
+    page = int(request.GET.get('page', 1))
     params = {
         'data': [],
         'data_p': [],
@@ -302,81 +322,62 @@ def book_search(request, page=1):
         'place' : [],
     }
 
-    page_cnt = 5  # 一画面あたり5コ表示する
-    onEachSide = 3  # 選択ページの両側には3コ表示する
-    onEnds = 2  # 左右両端には2コ表示する
+    page_cnt = 5
+    onEachSide = 3
+    onEnds = 2
 
-    # フィルタリングのための検索パラメータを取得
-    title_filter = request.POST.get('title', '')
-    author_filter = request.POST.get('author', '')
-    publisher_filter = request.POST.get('publisher', '')
-    pubdate_filter = request.POST.get('pubdate', '')
-    place_filter = request.POST.get('place', '')
+    # GET に変更
+    title_filter = request.GET.get('title', '')
+    author_filter = request.GET.get('author', '')
+    publisher_filter = request.GET.get('publisher', '')
+    pubdate_filter = request.GET.get('pubdate', '')
+    place_filter = request.GET.get('place', '')
 
-    # フィルタリングの条件を作成
     query_filter = Book.objects.all()
 
     if title_filter:
         query_filter = query_filter.filter(
-        Q(title__icontains=title_filter) | Q(titlekana__icontains=title_filter)
-    )
-
+            Q(title__icontains=title_filter) | Q(titlekana__icontains=title_filter)
+        )
     if author_filter:
         query_filter = query_filter.filter(
-        Q(author__icontains=author_filter) | Q(authorkana__icontains=author_filter)
-    )
-
+            Q(author__icontains=author_filter) | Q(authorkana__icontains=author_filter)
+        )
     if publisher_filter:
         query_filter = query_filter.filter(
-        Q(publisher__icontains=publisher_filter) | Q(pubkana__icontains=publisher_filter)
-    )
-
+            Q(publisher__icontains=publisher_filter) | Q(pubkana__icontains=publisher_filter)
+        )
     if pubdate_filter:
         query_filter = query_filter.filter(pubdate__icontains=pubdate_filter)
-
     if place_filter:
         query_filter = query_filter.filter(place__place__icontains=place_filter)
+
     params['place'] = Place.objects.all()
 
-    # 検索結果があれば、そのデータを使用し、なければすべてのデータを表示
     if query_filter.exists():
         params['data'] = query_filter
     else:
         params['data'] = Book.objects.order_by('id').all()
 
-    # paginatorのオブジェクトをつくってる
     data_page = Paginator(params['data'], page_cnt)
-
-    # paginatorのオブジェクトからページを指定した状態のオブジェクトつくってる
     params['data_p'] = data_page.get_page(page)
-
-    # 指定したページのオブジェクトからページリンク先のリストを作っている
     params['data_list'] = params['data_p'].paginator.get_elided_page_range(page, on_each_side=onEachSide, on_ends=onEnds)
+
+    get_params = request.GET.copy()
+    if 'page' in get_params:
+        get_params.pop('page')
+    params['query_string'] = get_params.urlencode()
 
     return render(request, 'books/book_search.html', params)
 
-def book_shelf(request, page=1):
+def book_shelf(request):
+    page = int(request.GET.get('page', 1))
     params = {
         'data': [],
-        'data_p': [],
-        'data_list': [],
+
     }
 
-    page_cnt = 30  # 一画面あたり5コ表示する
-    onEachSide = 3  # 選択ページの両側には3コ表示する
-    onEnds = 2  # 左右両端には2コ表示する
-
-    params['data'] = Book.objects.order_by('?').filter(is_borrowed=False)
-
-
-    # paginatorのオブジェクトをつくってる
-    data_page = Paginator(params['data'], page_cnt)
-
-    # paginatorのオブジェクトからページを指定した状態のオブジェクトつくってる
-    params['data_p'] = data_page.get_page(page)
-
-    # 指定したページのオブジェクトからページリンク先のリストを作っている
-    params['data_list'] = params['data_p'].paginator.get_elided_page_range(page, on_each_side=onEachSide, on_ends=onEnds)
+    params['data'] = Book.objects.order_by('?').filter(is_borrowed=False)[:30]
 
     return render(request, 'books/book_shelf.html', params)
 
@@ -393,6 +394,17 @@ def borrow_book(request, pk):
         if form.is_valid():
             requested_start = form.cleaned_data['date']
             requested_end = form.cleaned_data['returndate']
+
+            # 現在借りている（返却していない）本の数をチェック
+            current_loans = Lending.objects.filter(
+                username=request.user,
+                is_returned=False
+            ).count()
+
+            if current_loans >= 20:
+                messages.error(request, '21冊以上本を予約・借りることは出来ません。')
+                return redirect(reverse('books:borrow', kwargs={'pk': pk}))
+
             overlap_exists = Lending.objects.filter(
                 book=book,
                 returndate__gte=form.cleaned_data['date'],
@@ -483,11 +495,12 @@ def add_review(request, book_id):
             rating=rating
         )
 
-        return redirect('accounts:borrowing_history', page=1)  # レビュー投稿後、貸出履歴ページに戻る
+        return redirect('/borrowing_history/?page=1')  # レビュー投稿後、貸出履歴ページに戻る
 
     return render(request, 'books/add_review.html', {'book': book})
 
-def borrowed_books_list(request, page=1):
+def borrowed_books_list(request):
+    page = int(request.GET.get('page', 1))
     # 貸出中のデータを取得
     params = {
         'data': [],
@@ -502,11 +515,11 @@ def borrowed_books_list(request, page=1):
     
     params['today'] = datetime.date.today()
     # フィルタリングのための検索パラメータを取得
-    title_filter = request.POST.get('title', '')
-    author_filter = request.POST.get('author', '')
-    username_filter = request.POST.get('username', '')
-    place_filter = request.POST.get('place', '')
-    status_filter = request.POST.get('status', '')
+    title_filter = request.GET.get('title', '')
+    author_filter = request.GET.get('author', '')
+    username_filter = request.GET.get('username', '')
+    place_filter = request.GET.get('place', '')
+    status_filter = request.GET.get('status', '')
     today = datetime.date.today()
 
     # フィルタリングの条件を作成
@@ -541,25 +554,32 @@ def borrowed_books_list(request, page=1):
 
     # 指定したページのオブジェクトからページリンク先のリストを作っている
     params['data_list'] = params['data_p'].paginator.get_elided_page_range(page, on_each_side=onEachSide, on_ends=onEnds)
+
+    query_dict = request.GET.copy()
+    query_dict.pop('page', None)
+    params['query_string'] = urlencode(query_dict)
+
     return render(request, 'books/borrowed_books_list.html', params)
+
+from django.http import HttpResponseRedirect
 
 @login_required
 def return_book2(request, lending_id):
-    # Lendingオブジェクトを取得
     lending = get_object_or_404(Lending, id=lending_id)
-    
-    # Lendingのis_returnedをTrueにする
+
     lending.is_returned = True
     lending.returndate = datetime.date.today()
     lending.save()
 
-    # 対応するBookのis_borrowedをFalseにする
     book = lending.book
     book.is_borrowed = False
     book.save()
 
-    # 返却後、マイページにリダイレクト
-    return redirect('books:borrowed_books_list', page=1)
+    # 直前のページにリダイレクト（検索条件を保持）
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return HttpResponseRedirect(referer)
+    return redirect('books:borrowed_books_list')  # fallback
 
 @login_required
 def cancel_reservation2(request, lending_id):
@@ -568,4 +588,8 @@ def cancel_reservation2(request, lending_id):
     if lending.date > datetime.date.today():  # 未来の予約のみキャンセル可能
         lending.delete()
 
-    return redirect('books:borrowed_books_list', page=1)
+    # 直前のページにリダイレクト（検索条件を保持）
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return HttpResponseRedirect(referer)
+    return redirect('books:borrowed_books_list')  # fallback

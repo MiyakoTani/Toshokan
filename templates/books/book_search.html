@@ -8,25 +8,25 @@
 
 {% block content %}
 <br>
-<form method="POST">
+<form method="get">
     {% csrf_token %}
     <div class="container-fluid">
     <div class="row row-cols-auto">
     <div class="col-auto my-box">
     <label for="title" class="form-label">タイトル</label>
-    <input type="text" class="form-control" name="title" value="{{ request.POST.title }}"></div>
+    <input type="text" class="form-control" name="title" value="{{ request.GET.title }}"></div>
     <div class="col-auto my-box">
     <label for="author" class="form-label">著者</label>
-    <input type="text" class="form-control" name="author" value="{{ request.POST.author }}"></div>
+    <input type="text" class="form-control" name="author" value="{{ request.GET.author }}"></div>
     <div class="col-auto my-box">
     <label for="publisher" class="form-label">出版社</label>
-    <input type="text" class="form-control" name="publisher" value="{{ request.POST.publisher }}"></div>
+    <input type="text" class="form-control" name="publisher" value="{{ request.GET.publisher }}"></div>
     <div class="col-auto my-box">
     <label for="pubdate" class="form-label">出版日</label>
-    <input type="text" class="form-control" name="pubdate" value="{{ request.POST.pubdate }}"></div>
+    <input type="text" class="form-control" name="pubdate" value="{{ request.GET.pubdate }}"></div>
     <div class="col-auto my-box">
     <label for="place" class="form-label">場所</label>
-    <select class="form-select" name="place" value="{{ request.POST.place }}">
+    <select class="form-select" name="place" value="{{ request.GET.place }}">
     <option value=""></option>
     {% for item in place %}
     <option value="{{ item.place }}">{{ item.place }}</option>
@@ -44,6 +44,7 @@
         <th>書影</th>
         <th>タイトル</th>
         <th>著者</th>
+        <th>場所</th>
     </tr>
     {% for item in data_p %}
     <tr style="height: 120px;">
@@ -54,8 +55,9 @@
             {% endif %}
         </p>
         </td>
-        <td>{{item.title}}</td>
-        <td>{{item.author}}</td>
+        <td>{{item.title|truncatechars:20}}</td>
+        <td>{{item.author|truncatechars:20}}</td>
+        <td>{{item.place}}</td>
         <td>{% if item.is_borrowed %}<a href="{% url 'books:book_detail' item.pk %}" class="btn btn-outline-primary">予約</a>
             {% else %}<a href="{% url 'books:book_detail' item.pk %}" class="btn btn-primary">借りる</a>
             {% endif %}

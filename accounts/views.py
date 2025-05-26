@@ -33,7 +33,8 @@ class IndexView(BaseLoginView):
             context['today'] = today
         return context
     
-def borrowing_history(request, page=1):
+def borrowing_history(request):
+    page = int(request.GET.get('page', 1))
     # 現在ログインしているユーザーを取得
     user = request.user
     # ユーザーの貸出履歴を取得
@@ -143,7 +144,8 @@ def DeactivateUser(request):
     # 完了後、トップページなどにリダイレクト
     return redirect('accounts:index')
     
-def staff(request, page=1):
+def staff(request):
+    page = int(request.GET.get('page', 1))
     params = {
         'data':[],
         'data_p':[],
@@ -187,7 +189,7 @@ def StaffAccountsChange(request, num):
     if (request.method == 'POST'):
         user = StaffAccountsChangeForm(request.POST, instance=obj)
         user.save()
-        return redirect(to='/staff_search_user/1')
+        return redirect(to='/staff_search_user/?page=1')
     params = {
         'username':num,
         'form': StaffAccountsChangeForm(instance=obj),
