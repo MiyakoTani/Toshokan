@@ -75,7 +75,7 @@
     <tbody>
         {% for lending in lendings %}
         <tr>
-            <td>{{ lending.book.title|truncatechars:20 }}</td>
+            <td><a href="{% url 'books:book_detail' lending.book.pk %}">{{ lending.book.title|truncatechars:20 }}</a></td>
             <td>{{ lending.book.author|truncatechars:20 }}</td>
             <td>{{ lending.book.place }}</td>
             <td>{{ lending.date }}</td>
@@ -167,7 +167,7 @@
     <tbody>
         {% for lending in lendings %}
         <tr>
-            <td>{{ lending.book.title|truncatechars:20 }}</td>
+            <td><a href="{% url 'books:book_detail' lending.book.pk %}">{{ lending.book.title|truncatechars:20 }}</a></td>
             <td>{{ lending.book.author|truncatechars:20 }}</td>
             <td>{{ lending.book.place }}</td>
             <td>{{ lending.date }}</td>
