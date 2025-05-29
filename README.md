@@ -172,7 +172,6 @@ C:.\
 │  .gitignore\
 │  asgi.py\
 │  manage.py\
-│  manual.pdf\
 │  python\
 │  README.md\
 │  settings.py\
